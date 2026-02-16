@@ -33,19 +33,34 @@ export interface BlogPost {
   priority_score: number;
 }
 
+export interface PaginatedResult {
+  posts: BlogPost[];
+  total: number;
+  hasMore: boolean;
+}
+
 export async function getBlogPosts(
   language: 'pt' | 'en' = 'pt',
-  limit: number = 20,
-  offset: number = 0,
+  limit: number = 9,
+  page: number = 1,
   category?: string
-): Promise<BlogPost[]> {
+): Promise<PaginatedResult> {
+  const offset = (page - 1) * limit;
+
   if (!supabase) {
-    return getMockPosts(language, limit);
+    const mockPosts = getMockPosts(language, 50);
+    const filtered = category ? mockPosts.filter(p => p.category === category) : mockPosts;
+    return {
+      posts: filtered.slice(offset, offset + limit),
+      total: filtered.length,
+      hasMore: offset + limit < filtered.length
+    };
   }
 
+  // Query com contagem total
   let query = supabase
     .from('blog_posts')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .range(offset, offset + limit - 1);
@@ -54,18 +69,23 @@ export async function getBlogPosts(
     query = query.eq('category', category);
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
 
   if (error) {
     console.error('Error fetching posts:', error);
-    return [];
+    return { posts: [], total: 0, hasMore: false };
   }
 
-  // Parse tags de JSON string para array
-  return (data || []).map(post => ({
+  const posts = (data || []).map(post => ({
     ...post,
     tags: parseTags(post.tags)
   }));
+
+  return {
+    posts,
+    total: count || 0,
+    hasMore: offset + limit < (count || 0)
+  };
 }
 
 function parseTags(tags: string | string[] | null): string[] {

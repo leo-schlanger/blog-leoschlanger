@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, Clock, ArrowLeft, ExternalLink, Share2 } from 'lucide-react';
 import { getBlogPostBySlug } from '@/lib/supabase';
+import { SEO } from '@/components/SEO';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
 
@@ -73,10 +74,23 @@ export function Post() {
     }
   };
 
+  const currentSlug = language === 'pt' ? post.slug_pt : post.slug_en;
+
   return (
-    <article className="min-h-screen">
-      {/* Header */}
-      <header className="relative py-12 md:py-20 overflow-hidden">
+    <>
+      <SEO
+        title={title}
+        description={summary}
+        image={post.image_url || undefined}
+        url={`/post/${currentSlug}`}
+        type="article"
+        publishedAt={post.published_at || post.created_at}
+        tags={post.tags}
+      />
+
+      <article className="min-h-screen">
+        {/* Header */}
+        <header className="relative py-12 md:py-20 overflow-hidden">
         <div className="absolute inset-0 cyber-grid opacity-20" />
         <div className="absolute inset-0 bg-cyber-gradient" />
 
@@ -187,5 +201,6 @@ export function Post() {
         </div>
       </div>
     </article>
+    </>
   );
 }
