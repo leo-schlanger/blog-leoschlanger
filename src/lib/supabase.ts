@@ -61,7 +61,22 @@ export async function getBlogPosts(
     return [];
   }
 
-  return data || [];
+  // Parse tags de JSON string para array
+  return (data || []).map(post => ({
+    ...post,
+    tags: parseTags(post.tags)
+  }));
+}
+
+function parseTags(tags: string | string[] | null): string[] {
+  if (!tags) return [];
+  if (Array.isArray(tags)) return tags;
+  try {
+    const parsed = JSON.parse(tags);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 export async function getBlogPostBySlug(
@@ -88,7 +103,8 @@ export async function getBlogPostBySlug(
     return null;
   }
 
-  return data;
+  // Parse tags de JSON string para array
+  return data ? { ...data, tags: parseTags(data.tags) } : null;
 }
 
 export async function getCategories(): Promise<string[]> {
