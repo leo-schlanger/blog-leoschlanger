@@ -89,12 +89,11 @@ export async function getBlogPostBySlug(
     ) || null;
   }
 
-  const slugField = language === 'pt' ? 'slug_pt' : 'slug_en';
-
+  // Buscar em ambos os campos de slug para suportar troca de idioma
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
-    .eq(slugField, slug)
+    .or(`slug_pt.eq.${slug},slug_en.eq.${slug}`)
     .eq('status', 'published')
     .single();
 
