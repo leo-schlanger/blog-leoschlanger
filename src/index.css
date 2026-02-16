@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 2%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 155 100% 50%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 155 10% 10%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%;
+
+    --accent: 155 70% 45%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 155 100% 50%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-cyber-black text-foreground selection:bg-cyber-green selection:text-cyber-black;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+    margin: 0;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-2 bg-cyber-dark;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-green/40 hover:bg-cyber-green/60 rounded-full;
+  }
+
+  ::selection {
+    @apply bg-cyber-green text-cyber-black;
+  }
+}
+
+@layer components {
+  .cyber-button {
+    @apply relative px-5 py-2.5 bg-transparent text-cyber-green border border-cyber-green
+           shadow-[0_0_0.5rem_0_rgba(0,255,157,0.2)] transition-all duration-300
+           hover:bg-cyber-green/10 hover:shadow-[0_0_1rem_0_rgba(0,255,157,0.4)]
+           focus:outline-none focus:ring-2 focus:ring-cyber-green/50 focus:ring-offset-0;
+  }
+
+  .cyber-card {
+    @apply bg-cyber-dark border border-cyber-green/30 shadow-[0_0_0.5rem_0_rgba(0,255,157,0.1)]
+           backdrop-blur-md relative overflow-hidden rounded-md;
+  }
+
+  .cyber-grid {
+    @apply bg-[size:40px_40px] bg-cyber-grid;
+  }
+
+  .cyber-text {
+    @apply text-cyber-green font-medium;
+  }
+
+  .cyber-title {
+    @apply text-cyber-green font-bold tracking-wide;
+  }
+
+  .cyber-highlight {
+    @apply text-cyber-green animate-glow;
+  }
+
+  .prose-cyber {
+    @apply text-gray-300;
+  }
+
+  .prose-cyber h1,
+  .prose-cyber h2,
+  .prose-cyber h3,
+  .prose-cyber h4 {
+    @apply text-cyber-green font-bold mt-6 mb-4;
+  }
+
+  .prose-cyber p {
+    @apply mb-4 leading-relaxed;
+  }
+
+  .prose-cyber a {
+    @apply text-cyber-green underline hover:text-cyber-green/80;
+  }
+
+  .prose-cyber strong {
+    @apply text-white font-semibold;
+  }
+
+  .prose-cyber ul,
+  .prose-cyber ol {
+    @apply my-4 pl-6;
+  }
+
+  .prose-cyber li {
+    @apply mb-2;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
