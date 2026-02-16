@@ -21,7 +21,7 @@ export function Home() {
   const totalPages = data ? Math.ceil(data.total / POSTS_PER_PAGE) : 0;
   const posts = data?.posts || [];
   const featuredPost = currentPage === 1 && posts.length > 0 ? posts[0] : null;
-  const otherPosts = currentPage === 1 && posts.length > 0 ? posts.slice(1) : posts;
+  const otherPosts = currentPage === 1 && posts.length > 0 ? posts : posts;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
