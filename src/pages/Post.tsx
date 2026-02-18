@@ -5,6 +5,7 @@ import { getBlogPostBySlug } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
+import { getPostImage } from '@/lib/defaultImages';
 
 export function Post() {
   const { slug } = useParams<{ slug: string }>();
@@ -81,7 +82,7 @@ export function Post() {
       <SEO
         title={title}
         description={summary}
-        image={post.image_url || undefined}
+        image={getPostImage(post.image_url, post.category, post.id)}
         url={`/post/${currentSlug}`}
         type="article"
         publishedAt={post.published_at || post.created_at}
@@ -146,17 +147,15 @@ export function Post() {
       </header>
 
       {/* Featured Image */}
-      {post.image_url && (
-        <div className="container mx-auto px-4 -mt-8 relative z-20">
-          <div className="max-w-4xl mx-auto">
-            <img
-              src={post.image_url}
-              alt={title}
-              className="w-full h-64 md:h-96 object-cover rounded-lg border border-cyber-green/20"
-            />
-          </div>
+      <div className="container mx-auto px-4 -mt-8 relative z-20">
+        <div className="max-w-4xl mx-auto">
+          <img
+            src={getPostImage(post.image_url, post.category, post.id)}
+            alt={title}
+            className="w-full h-64 md:h-96 object-cover rounded-lg border border-cyber-green/20"
+          />
         </div>
-      )}
+      </div>
 
       {/* Content */}
       <div className="container mx-auto px-4 py-12">

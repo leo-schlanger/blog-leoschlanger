@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime, cn } from '@/lib/utils';
+import { getPostImage } from '@/lib/defaultImages';
 import type { BlogPost } from '@/lib/supabase';
 
 interface BlogCardProps {
@@ -18,6 +19,7 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
   const slug = language === 'pt' ? post.slug_pt : post.slug_en;
 
   const readingTime = getReadingTime(content);
+  const imageUrl = getPostImage(post.image_url, post.category, post.id);
   const categoryLabel = translations[post.category as keyof typeof translations]
     ? t(
         (translations[post.category as keyof typeof translations] as { pt: string; en: string }).pt,
@@ -32,17 +34,11 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Image */}
             <div className="relative h-64 md:h-full overflow-hidden rounded-l-md">
-              {post.image_url ? (
-                <img
-                  src={post.image_url}
-                  alt={title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-cyber-green/20 to-cyber-dark flex items-center justify-center">
-                  <span className="text-6xl text-cyber-green/30">📰</span>
-                </div>
-              )}
+              <img
+                src={imageUrl}
+                alt={title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-cyber-black/80 to-transparent" />
             </div>
 
@@ -92,17 +88,11 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
       <Link to={`/post/${slug}`} className="block flex-1 flex flex-col">
         {/* Image */}
         <div className="relative h-48 overflow-hidden rounded-t-md">
-          {post.image_url ? (
-            <img
-              src={post.image_url}
-              alt={title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-cyber-green/20 to-cyber-dark flex items-center justify-center">
-              <span className="text-4xl text-cyber-green/30">📰</span>
-            </div>
-          )}
+          <img
+            src={imageUrl}
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-cyber-black/60 to-transparent" />
 
           {/* Category Badge */}
