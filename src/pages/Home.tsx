@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { BlogCard } from '@/components/BlogCard';
 import { Pagination } from '@/components/Pagination';
+import { FeaturedCarousel } from '@/components/FeaturedCarousel';
+import { DonationSection } from '@/components/DonationSection';
 import { SEO } from '@/components/SEO';
 import { getBlogPosts } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
@@ -20,8 +22,8 @@ export function Home() {
 
   const totalPages = data ? Math.ceil(data.total / POSTS_PER_PAGE) : 0;
   const posts = data?.posts || [];
-  const featuredPost = currentPage === 1 && posts.length > 0 ? posts[0] : null;
-  const otherPosts = currentPage === 1 && posts.length > 0 ? posts : posts;
+  const carouselPosts = currentPage === 1 ? posts.slice(0, 5) : [];
+  const otherPosts = posts;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -64,10 +66,10 @@ export function Home() {
           </div>
         ) : (
           <>
-            {/* Featured Post */}
-            {featuredPost && (
+            {/* Featured Carousel */}
+            {currentPage === 1 && carouselPosts.length > 0 && (
               <section className="container mx-auto px-4 -mt-8 relative z-20">
-                <BlogCard post={featuredPost} featured />
+                <FeaturedCarousel posts={carouselPosts} />
               </section>
             )}
 
@@ -85,7 +87,16 @@ export function Home() {
               </div>
 
               {otherPosts.length > 0 ? (
-                <>
+                <div className="flex flex-col gap-8">
+                  {/* Top Pagination */}
+                  {totalPages > 1 && (
+                    <Pagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {otherPosts.map((post) => (
                       <BlogCard key={post.id} post={post} />
@@ -97,13 +108,15 @@ export function Home() {
                     totalPages={totalPages}
                     onPageChange={handlePageChange}
                   />
-                </>
+                </div>
               ) : (
                 <p className="text-gray-400 text-center py-8">
                   {t(translations.noResults.pt, translations.noResults.en)}
                 </p>
               )}
             </section>
+
+            {currentPage === 1 && <DonationSection />}
           </>
         )}
       </div>

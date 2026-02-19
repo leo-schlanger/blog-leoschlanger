@@ -25,9 +25,9 @@ export function Category() {
 
   const categoryLabel = translations[category as keyof typeof translations]
     ? t(
-        (translations[category as keyof typeof translations] as { pt: string; en: string }).pt,
-        (translations[category as keyof typeof translations] as { pt: string; en: string }).en
-      )
+      (translations[category as keyof typeof translations] as { pt: string; en: string }).pt,
+      (translations[category as keyof typeof translations] as { pt: string; en: string }).en
+    )
     : category;
 
   const handlePageChange = (page: number) => {
@@ -81,7 +81,15 @@ export function Category() {
               <Loader2 className="h-8 w-8 animate-spin text-cyber-green" />
             </div>
           ) : data && data.posts.length > 0 ? (
-            <>
+            <div className="flex flex-col gap-8">
+              {data.total > POSTS_PER_PAGE && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {data.posts.map((post) => (
                   <BlogCard key={post.id} post={post} />
@@ -93,7 +101,7 @@ export function Category() {
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
               />
-            </>
+            </div>
           ) : (
             <p className="text-gray-400 text-center py-12">
               {t(translations.noResults.pt, translations.noResults.en)}
