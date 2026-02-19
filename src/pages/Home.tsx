@@ -115,10 +115,9 @@ export function Home() {
                 </p>
               )}
             </section>
-
-            {currentPage === 1 && <DonationSection />}
           </>
         )}
+        <DonationSection />
       </div>
     </>
   );

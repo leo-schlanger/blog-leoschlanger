@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Calendar, Clock, ArrowLeft, ExternalLink, Share2 } from 'lucide-react';
 import { getBlogPostBySlug } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
+import { DonationSection } from '@/components/DonationSection';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
@@ -57,9 +58,9 @@ export function Post() {
   const readingTime = getReadingTime(content);
   const categoryLabel = translations[post.category as keyof typeof translations]
     ? t(
-        (translations[post.category as keyof typeof translations] as { pt: string; en: string }).pt,
-        (translations[post.category as keyof typeof translations] as { pt: string; en: string }).en
-      )
+      (translations[post.category as keyof typeof translations] as { pt: string; en: string }).pt,
+      (translations[post.category as keyof typeof translations] as { pt: string; en: string }).en
+    )
     : post.category;
 
   const sharePost = () => {
@@ -92,114 +93,115 @@ export function Post() {
       <article className="min-h-screen">
         {/* Header */}
         <header className="relative py-12 md:py-20 overflow-hidden">
-        <div className="absolute inset-0 cyber-grid opacity-20" />
-        <div className="absolute inset-0 bg-cyber-gradient" />
+          <div className="absolute inset-0 cyber-grid opacity-20" />
+          <div className="absolute inset-0 bg-cyber-gradient" />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl mx-auto">
-            {/* Back Link */}
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-cyber-green mb-8 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              {t(translations.backToHome.pt, translations.backToHome.en)}
-            </Link>
-
-            {/* Category */}
-            <Link
-              to={`/category/${post.category}`}
-              className="inline-block px-3 py-1 text-sm font-medium bg-cyber-green/10 text-cyber-green rounded mb-4"
-            >
-              {categoryLabel}
-            </Link>
-
-            {/* Title */}
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
-              {title}
-            </h1>
-
-            {/* Summary */}
-            <p className="text-xl text-gray-400 mb-8">
-              {summary}
-            </p>
-
-            {/* Meta */}
-            <div className="flex flex-wrap items-center gap-6 text-gray-500">
-              <span className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                {formatDate(post.published_at || post.created_at, language === 'pt' ? 'pt-BR' : 'en-US')}
-              </span>
-              <span className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                {readingTime} {t(translations.readingTime.pt, translations.readingTime.en)}
-              </span>
-              <button
-                onClick={sharePost}
-                className="flex items-center gap-2 hover:text-cyber-green transition-colors"
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-3xl mx-auto">
+              {/* Back Link */}
+              <Link
+                to="/"
+                className="inline-flex items-center gap-2 text-gray-400 hover:text-cyber-green mb-8 transition-colors"
               >
-                <Share2 className="h-5 w-5" />
-                {t('Compartilhar', 'Share')}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+                <ArrowLeft className="h-4 w-4" />
+                {t(translations.backToHome.pt, translations.backToHome.en)}
+              </Link>
 
-      {/* Featured Image */}
-      <div className="container mx-auto px-4 -mt-8 relative z-20">
-        <div className="max-w-4xl mx-auto">
-          <img
-            src={getPostImage(post.image_url, post.category, post.id)}
-            alt={title}
-            className="w-full h-64 md:h-96 object-cover rounded-lg border border-cyber-green/20"
-          />
-        </div>
-      </div>
+              {/* Category */}
+              <Link
+                to={`/category/${post.category}`}
+                className="inline-block px-3 py-1 text-sm font-medium bg-cyber-green/10 text-cyber-green rounded mb-4"
+              >
+                {categoryLabel}
+              </Link>
 
-      {/* Content */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-3xl mx-auto">
-          <div className="prose-cyber">
-            {content.split('\n\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
+              {/* Title */}
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
+                {title}
+              </h1>
 
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-12 pt-8 border-t border-cyber-green/20">
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 text-sm bg-cyber-dark border border-cyber-green/20 rounded text-gray-400"
-                  >
-                    #{tag}
-                  </span>
-                ))}
+              {/* Summary */}
+              <p className="text-xl text-gray-400 mb-8">
+                {summary}
+              </p>
+
+              {/* Meta */}
+              <div className="flex flex-wrap items-center gap-6 text-gray-500">
+                <span className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  {formatDate(post.published_at || post.created_at, language === 'pt' ? 'pt-BR' : 'en-US')}
+                </span>
+                <span className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  {readingTime} {t(translations.readingTime.pt, translations.readingTime.en)}
+                </span>
+                <button
+                  onClick={sharePost}
+                  className="flex items-center gap-2 hover:text-cyber-green transition-colors"
+                >
+                  <Share2 className="h-5 w-5" />
+                  {t('Compartilhar', 'Share')}
+                </button>
               </div>
             </div>
-          )}
+          </div>
+        </header>
 
-          {/* Source */}
-          <div className="mt-8 p-4 bg-cyber-dark/50 rounded-lg border border-cyber-green/10">
-            <p className="text-sm text-gray-500">
-              {t(translations.source.pt, translations.source.en)}:{' '}
-              <a
-                href={post.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-cyber-green hover:underline inline-flex items-center gap-1"
-              >
-                {post.source_name}
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </p>
+        {/* Featured Image */}
+        <div className="container mx-auto px-4 -mt-8 relative z-20">
+          <div className="max-w-4xl mx-auto">
+            <img
+              src={getPostImage(post.image_url, post.category, post.id)}
+              alt={title}
+              className="w-full h-64 md:h-96 object-cover rounded-lg border border-cyber-green/20"
+            />
           </div>
         </div>
-      </div>
-    </article>
+
+        {/* Content */}
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-3xl mx-auto">
+            <div className="prose-cyber">
+              {content.split('\n\n').map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </div>
+
+            {/* Tags */}
+            {post.tags && post.tags.length > 0 && (
+              <div className="mt-12 pt-8 border-t border-cyber-green/20">
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 text-sm bg-cyber-dark border border-cyber-green/20 rounded text-gray-400"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Source */}
+            <div className="mt-8 p-4 bg-cyber-dark/50 rounded-lg border border-cyber-green/10">
+              <p className="text-sm text-gray-500">
+                {t(translations.source.pt, translations.source.en)}:{' '}
+                <a
+                  href={post.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-cyber-green hover:underline inline-flex items-center gap-1"
+                >
+                  {post.source_name}
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <DonationSection />
+      </article>
     </>
   );
 }

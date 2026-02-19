@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Search as SearchIcon, Loader2 } from 'lucide-react';
 import { BlogCard } from '@/components/BlogCard';
+import { DonationSection } from '@/components/DonationSection';
 import { SEO } from '@/components/SEO';
 import { searchPosts } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
@@ -112,6 +113,7 @@ export function Search() {
             </p>
           )}
         </section>
+        <DonationSection />
       </div>
     </>
   );

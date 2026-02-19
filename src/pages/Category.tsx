@@ -1,9 +1,11 @@
+```typescript
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { BlogCard } from '@/components/BlogCard';
 import { Pagination } from '@/components/Pagination';
+import { DonationSection } from '@/components/DonationSection';
 import { SEO } from '@/components/SEO';
 import { getBlogPosts } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
@@ -40,10 +42,10 @@ export function Category() {
       <SEO
         title={categoryLabel}
         description={t(
-          `Notícias sobre ${categoryLabel} - Criptomoedas e economia global`,
-          `News about ${categoryLabel} - Cryptocurrencies and global economy`
+          `Notícias sobre ${ categoryLabel } - Criptomoedas e economia global`,
+          `News about ${ categoryLabel } - Cryptocurrencies and global economy`
         )}
-        url={`/category/${category}`}
+        url={`/ category / ${ category } `}
       />
 
       <div className="min-h-screen">
@@ -108,7 +110,10 @@ export function Category() {
             </p>
           )}
         </section>
+
+        <DonationSection />
       </div>
     </>
   );
 }
+```
