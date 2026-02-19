@@ -1,4 +1,3 @@
-```typescript
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -42,10 +41,10 @@ export function Category() {
       <SEO
         title={categoryLabel}
         description={t(
-          `Notícias sobre ${ categoryLabel } - Criptomoedas e economia global`,
-          `News about ${ categoryLabel } - Cryptocurrencies and global economy`
+          `Notícias sobre ${categoryLabel} - Criptomoedas e economia global`,
+          `News about ${categoryLabel} - Cryptocurrencies and global economy`
         )}
-        url={`/ category / ${ category } `}
+        url={`/category/${category}`}
       />
 
       <div className="min-h-screen">
@@ -116,4 +115,3 @@ export function Category() {
     </>
   );
 }
-```

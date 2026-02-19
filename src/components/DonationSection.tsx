@@ -34,18 +34,28 @@ export function DonationSection() {
                             href={paypalUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group relative inline-flex items-center justify-center px-10 py-5 font-bold text-cyber-black transition-all duration-300 bg-cyber-green rounded-xl hover:bg-cyber-green/90 active:scale-95 shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:shadow-[0_0_40px_rgba(0,255,157,0.6)]"
+                            className="group relative inline-flex items-center justify-center px-10 py-4 font-bold transition-all duration-300 bg-[#FFC439] rounded-full hover:bg-[#ffb300] active:scale-95 shadow-lg"
                         >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                                 <svg
-                                    className="h-6 w-auto fill-[#003087]"
+                                    className="h-6 w-auto"
                                     viewBox="0 0 24 24"
                                     xmlns="http://www.w3.org/2000/svg"
                                 >
-                                    <path d="M20.067 8.478c.492.288.756.764.756 1.417 0 1.25-.916 2.417-2.333 2.417h-3.333L14 18.333c-.083.417-.417.667-.833.667H10l.667-3.333-.5-.167H7.167L8.667 8.333c.083-.417.417-.667.833-.667H13.5c1.167 0 2.083.333 2.667.812zm-3.334 1.5c0-.417-.333-.667-.833-.667h-2.167l-.666 3.333h2.167c.5 0 .833-.25.833-.667l.666-2zm-3.333 6.666l.5-2.5h-1.667l-.5 2.5h1.667z" />
-                                    <path d="M12 1h-7.5c-.8 0-1.5.7-1.7 1.4L1 14.2c-.1.3 0 .6.3.8h3.3l1-5.7c.1-.8.9-1.4 1.7-1.4h3.5c3.2 0 5.8-1.3 6.6-4.5.4-1.8.1-3.4-1-4.4C15.4 1.4 13.8 1 12 1z" opacity=".25" />
+                                    <path
+                                        fill="#003087"
+                                        d="M17.271 2.407C16.5 1.4 15 1 13 1H5.8c-.4 0-.8.3-.9.7l-3.3 16.6c0 .2 0 .4.2.5h3.6l.8-4.1h2.1c3.5 0 5.4-1.6 6.1-4.7.4-2 .2-3.6-1.1-4.6z"
+                                    />
+                                    <path
+                                        fill="#009CDE"
+                                        d="M17.271 2.407C16.5 1.4 15 1 13 1H10.5l-2.6 13.1c.1-.1.2-.1.3-.1h2.1c3.5 0 5.4-1.6 6.1-4.7.4-2 .2-3.6-1.1-4.6l1.9-1.3z"
+                                    />
+                                    <path
+                                        fill="#012169"
+                                        d="M8.8 8.1l-1.9 9.5-.4 2.1c0 .2.2.3.4.3h3.3c.4 0 .7-.3.8-.7l.9-4.8c.1-.4.4-.7.8-.7h.9c3.1 0 4.7-1.4 5.3-4.1.2-1.2.1-2.2-.4-3-1 2.7-2.9 4-6.1 4H8.8z"
+                                    />
                                 </svg>
-                                <span className="text-lg">{t('Fazer uma doação', 'Make a donation')}</span>
+                                <span className="text-[#003087] text-lg font-extrabold uppercase tracking-tight">{t('Doar agora', 'Donate now')}</span>
                             </div>
                         </a>
                         <p className="text-gray-500 text-xs italic">
