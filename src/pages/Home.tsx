@@ -5,6 +5,7 @@ import { BlogCard } from '@/components/BlogCard';
 import { Pagination } from '@/components/Pagination';
 import { FeaturedCarousel } from '@/components/FeaturedCarousel';
 import { DonationSection } from '@/components/DonationSection';
+import { MarketThermometer } from '@/components/MarketThermometer';
 import { SEO } from '@/components/SEO';
 import { getBlogPosts } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
@@ -41,17 +42,22 @@ export function Home() {
           <div className="absolute inset-0 bg-cyber-gradient" />
 
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                <span className="text-white">{t('Notícias ', 'News ')}</span>
-                <span className="cyber-title">{t('Cripto & Macro', 'Crypto & Macro')}</span>
-              </h1>
-              <p className="text-xl text-gray-400 mb-8">
-                {t(
-                  'Análises e notícias sobre criptomoedas, economia global, bancos centrais e mercados financeiros.',
-                  'Analysis and news on cryptocurrencies, global economy, central banks and financial markets.'
-                )}
-              </p>
+            <div className="grid lg:grid-cols-2 gap-8 items-start">
+              <div className="max-w-xl">
+                <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                  <span className="text-white">{t('Notícias ', 'News ')}</span>
+                  <span className="cyber-title">{t('Cripto & Macro', 'Crypto & Macro')}</span>
+                </h1>
+                <p className="text-lg text-gray-400">
+                  {t(
+                    'Análises e notícias sobre criptomoedas, economia global, bancos centrais e mercados financeiros.',
+                    'Analysis and news on cryptocurrencies, global economy, central banks and financial markets.'
+                  )}
+                </p>
+              </div>
+              <div className="lg:mt-0 mt-4">
+                <MarketThermometer />
+              </div>
             </div>
           </div>
         </section>
