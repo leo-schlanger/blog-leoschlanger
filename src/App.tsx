@@ -4,8 +4,6 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Home } from '@/pages/Home';
 import { Post } from '@/pages/Post';
-import { Category } from '@/pages/Category';
-import { Search } from '@/pages/Search';
 import { NotFound } from '@/pages/NotFound';
 import { LanguageProvider, useLanguageProvider } from '@/hooks/useLanguage';
 
@@ -29,8 +27,6 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/post/:slug" element={<Post />} />
-            <Route path="/category/:category" element={<Category />} />
-            <Route path="/search" element={<Search />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

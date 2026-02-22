@@ -1,9 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, Clock, ArrowLeft, ExternalLink, Share2 } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart } from 'lucide-react';
 import { getBlogPostBySlug } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
-import { DonationSection } from '@/components/DonationSection';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
@@ -107,13 +106,10 @@ export function Post() {
                 {t(translations.backToHome.pt, translations.backToHome.en)}
               </Link>
 
-              {/* Category */}
-              <Link
-                to={`/category/${post.category}`}
-                className="inline-block px-3 py-1 text-sm font-medium bg-cyber-green/10 text-cyber-green rounded mb-4"
-              >
+              {/* Category Badge */}
+              <span className="inline-block px-3 py-1 text-sm font-medium bg-cyber-green/10 text-cyber-green rounded mb-4">
                 {categoryLabel}
-              </Link>
+              </span>
 
               {/* Title */}
               <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
@@ -198,9 +194,31 @@ export function Post() {
                 </a>
               </p>
             </div>
+
+            {/* Donation CTA */}
+            <div className="mt-12 p-6 bg-cyber-dark rounded-xl border border-cyber-green/20 text-center">
+              <Heart className="w-8 h-8 text-cyber-green mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-white mb-2">
+                {t('Gostou do conteúdo?', 'Enjoyed the content?')}
+              </h3>
+              <p className="text-gray-400 text-sm mb-4">
+                {t(
+                  'Ajude a manter o projeto ativo com uma doação.',
+                  'Help keep the project active with a donation.'
+                )}
+              </p>
+              <a
+                href="https://www.paypal.com/donate/?hosted_button_id=UAB9LYC87EVBC"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cyber-button inline-flex items-center gap-2"
+              >
+                <Heart className="w-4 h-4" />
+                {t('Fazer uma doação', 'Make a donation')}
+              </a>
+            </div>
           </div>
         </div>
-        <DonationSection />
       </article>
     </>
   );

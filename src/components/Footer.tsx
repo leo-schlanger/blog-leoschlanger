@@ -1,22 +1,15 @@
 import { Github, Linkedin, Twitter } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useLanguage, translations } from '@/hooks/useLanguage';
+import { useLanguage } from '@/hooks/useLanguage';
 
 export function Footer() {
   const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
-  const categories = [
-    { path: '/category/crypto', label: t(translations.crypto.pt, translations.crypto.en) },
-    { path: '/category/macro_global', label: t(translations.macro_global.pt, translations.macro_global.en) },
-    { path: '/category/central_banks', label: t(translations.central_banks.pt, translations.central_banks.en) },
-    { path: '/category/commodities', label: t(translations.commodities.pt, translations.commodities.en) },
-  ];
-
   return (
     <footer className="border-t border-cyber-green/20 bg-cyber-dark/50">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="/" className="inline-block">
@@ -37,6 +30,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-cyber-green transition-colors"
+                aria-label="GitHub"
               >
                 <Github className="h-5 w-5" />
               </a>
@@ -45,6 +39,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-cyber-green transition-colors"
+                aria-label="LinkedIn"
               >
                 <Linkedin className="h-5 w-5" />
               </a>
@@ -53,29 +48,11 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-cyber-green transition-colors"
+                aria-label="Twitter"
               >
                 <Twitter className="h-5 w-5" />
               </a>
             </div>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">
-              {t(translations.categories.pt, translations.categories.en)}
-            </h3>
-            <ul className="space-y-2">
-              {categories.map((cat) => (
-                <li key={cat.path}>
-                  <Link
-                    to={cat.path}
-                    className="text-gray-400 hover:text-cyber-green text-sm transition-colors"
-                  >
-                    {cat.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
 
           {/* Links */}
@@ -89,7 +66,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-cyber-green text-sm transition-colors"
                 >
-                  {t(translations.mainSite.pt, translations.mainSite.en)}
+                  {t('Site Principal', 'Main Site')}
                 </a>
               </li>
               <li>
@@ -110,6 +87,16 @@ export function Footer() {
                   className="text-gray-400 hover:text-cyber-green text-sm transition-colors"
                 >
                   {t('Contato', 'Contact')}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.paypal.com/donate/?hosted_button_id=UAB9LYC87EVBC"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-cyber-green text-sm transition-colors"
+                >
+                  {t('Apoiar', 'Support')}
                 </a>
               </li>
             </ul>
