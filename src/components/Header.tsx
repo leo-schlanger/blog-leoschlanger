@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import { Search, Globe } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Search, Globe, TrendingUp } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { SearchModal } from './SearchModal';
@@ -7,6 +7,9 @@ import { SearchModal } from './SearchModal';
 export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
+  const location = useLocation();
+
+  const isToolsPage = location.pathname === '/tools';
 
   return (
     <>
@@ -23,6 +26,18 @@ export function Header() {
 
             {/* Actions */}
             <div className="flex items-center space-x-3">
+              {/* Tools Link */}
+              <Link
+                to="/tools"
+                className={`flex items-center space-x-1.5 px-2.5 py-1.5 text-sm rounded-lg transition-colors ${
+                  isToolsPage
+                    ? 'bg-cyber-green/20 text-cyber-green'
+                    : 'text-gray-400 hover:text-cyber-green hover:bg-cyber-green/10'
+                }`}
+              >
+                <TrendingUp className="h-4 w-4" />
+                <span className="hidden sm:inline text-xs font-medium">Tools</span>
+              </Link>
               {/* Search */}
               <button
                 onClick={() => setIsSearchOpen(true)}

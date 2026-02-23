@@ -1,12 +1,10 @@
-import { MarketThermometer } from './MarketThermometer';
-import { EconomicCalendar } from './EconomicCalendar';
+import { TradingToolsCard } from './TradingToolsCard';
 import { DonationWidget } from './DonationWidget';
 
 export function Sidebar() {
   return (
     <aside className="space-y-6 lg:sticky lg:top-24">
-      <MarketThermometer />
-      <EconomicCalendar />
+      <TradingToolsCard />
       <DonationWidget />
     </aside>
   );

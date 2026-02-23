@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Home } from '@/pages/Home';
 import { Post } from '@/pages/Post';
+import { TradingTools } from '@/pages/TradingTools';
 import { NotFound } from '@/pages/NotFound';
 import { LanguageProvider, useLanguageProvider } from '@/hooks/useLanguage';
 
@@ -26,6 +27,7 @@ function AppContent() {
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/tools" element={<TradingTools />} />
             <Route path="/post/:slug" element={<Post />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
