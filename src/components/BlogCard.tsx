@@ -3,6 +3,7 @@ import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime, cn } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
+import { PostImage } from '@/components/PostImage';
 import type { BlogPost } from '@/lib/supabase';
 
 interface BlogCardProps {
@@ -34,9 +35,11 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Image */}
             <div className="relative h-64 md:h-full overflow-hidden rounded-l-md">
-              <img
+              <PostImage
                 src={imageUrl}
                 alt={title}
+                category={post.category}
+                postId={post.id}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-cyber-black/80 to-transparent" />
@@ -88,9 +91,11 @@ export function BlogCard({ post, featured = false }: BlogCardProps) {
       <Link to={`/post/${slug}`} className="block flex-1 flex flex-col">
         {/* Image */}
         <div className="relative h-48 overflow-hidden rounded-t-md">
-          <img
+          <PostImage
             src={imageUrl}
             alt={title}
+            category={post.category}
+            postId={post.id}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-cyber-black/60 to-transparent" />

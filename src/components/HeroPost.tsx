@@ -3,6 +3,7 @@ import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
+import { PostImage } from '@/components/PostImage';
 import type { BlogPost } from '@/lib/supabase';
 
 interface HeroPostProps {
@@ -32,9 +33,11 @@ export function HeroPost({ post }: HeroPostProps) {
         <div className="grid lg:grid-cols-2">
           {/* Image */}
           <div className="relative h-64 lg:h-96 overflow-hidden">
-            <img
+            <PostImage
               src={imageUrl}
               alt={title}
+              category={post.category}
+              postId={post.id}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-cyber-black/90 via-cyber-black/50 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-cyber-dark" />

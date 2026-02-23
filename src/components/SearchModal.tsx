@@ -6,6 +6,7 @@ import { searchPosts, type BlogPost } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
+import { PostImage } from '@/components/PostImage';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -177,9 +178,11 @@ function SearchResult({
       onClick={onClick}
       className="flex gap-4 p-4 hover:bg-cyber-green/5 transition-colors"
     >
-      <img
+      <PostImage
         src={imageUrl}
         alt={title}
+        category={post.category}
+        postId={post.id}
         className="w-20 h-16 object-cover rounded-lg flex-shrink-0"
       />
       <div className="flex-1 min-w-0">

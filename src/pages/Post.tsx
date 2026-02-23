@@ -6,6 +6,7 @@ import { SEO } from '@/components/SEO';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
+import { PostImage } from '@/components/PostImage';
 
 export function Post() {
   const { slug } = useParams<{ slug: string }>();
@@ -146,9 +147,11 @@ export function Post() {
         {/* Featured Image */}
         <div className="container mx-auto px-4 -mt-8 relative z-20">
           <div className="max-w-4xl mx-auto">
-            <img
+            <PostImage
               src={getPostImage(post.image_url, post.category, post.id)}
               alt={title}
+              category={post.category}
+              postId={post.id}
               className="w-full h-64 md:h-96 object-cover rounded-lg border border-cyber-green/20"
             />
           </div>
