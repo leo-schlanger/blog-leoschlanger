@@ -41,7 +41,7 @@ export interface PaginatedResult {
 
 export async function getBlogPosts(
   language: 'pt' | 'en' = 'pt',
-  limit: number = 9,
+  limit: number = 10,
   page: number = 1,
   category?: string
 ): Promise<PaginatedResult> {
