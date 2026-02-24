@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { POSTS_PER_PAGE, SEARCH_QUERY_LIMIT } from '@/lib/constants';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -41,7 +42,7 @@ export interface PaginatedResult {
 
 export async function getBlogPosts(
   language: 'pt' | 'en' = 'pt',
-  limit: number = 10,
+  limit: number = POSTS_PER_PAGE,
   page: number = 1,
   category?: string
 ): Promise<PaginatedResult> {
@@ -165,7 +166,7 @@ export async function searchPosts(
     .eq('status', 'published')
     .or(`${titleField}.ilike.%${query}%,${contentField}.ilike.%${query}%`)
     .order('published_at', { ascending: false })
-    .limit(20);
+    .limit(SEARCH_QUERY_LIMIT);
 
   if (error) {
     console.error('Error searching posts:', error);

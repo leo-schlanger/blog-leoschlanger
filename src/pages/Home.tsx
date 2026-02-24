@@ -9,8 +9,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { SEO } from '@/components/SEO';
 import { getBlogPosts } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
-
-const POSTS_PER_PAGE = 6;
+import { POSTS_PER_PAGE } from '@/lib/constants';
 
 export function Home() {
   const { language, t } = useLanguage();

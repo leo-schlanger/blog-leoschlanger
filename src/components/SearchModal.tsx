@@ -7,6 +7,7 @@ import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
 import { PostImage } from '@/components/PostImage';
+import { SEARCH_RESULTS_LIMIT } from '@/lib/constants';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -111,7 +112,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             </div>
           ) : results && results.length > 0 ? (
             <div className="divide-y divide-cyber-green/10">
-              {results.slice(0, 10).map((post) => (
+              {results.slice(0, SEARCH_RESULTS_LIMIT).map((post) => (
                 <SearchResult
                   key={post.id}
                   post={post}
@@ -119,11 +120,11 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
                   onClick={handleResultClick}
                 />
               ))}
-              {results.length > 10 && (
+              {results.length > SEARCH_RESULTS_LIMIT && (
                 <div className="p-4 text-center text-gray-500 text-sm">
                   {t(
-                    `Mostrando 10 de ${results.length} resultados`,
-                    `Showing 10 of ${results.length} results`
+                    `Mostrando ${SEARCH_RESULTS_LIMIT} de ${results.length} resultados`,
+                    `Showing ${SEARCH_RESULTS_LIMIT} of ${results.length} results`
                   )}
                 </div>
               )}
@@ -167,9 +168,9 @@ function SearchResult({
 
   const categoryLabel = translations[post.category as keyof typeof translations]
     ? t(
-        (translations[post.category as keyof typeof translations] as { pt: string; en: string }).pt,
-        (translations[post.category as keyof typeof translations] as { pt: string; en: string }).en
-      )
+      (translations[post.category as keyof typeof translations] as { pt: string; en: string }).pt,
+      (translations[post.category as keyof typeof translations] as { pt: string; en: string }).en
+    )
     : post.category;
 
   return (
