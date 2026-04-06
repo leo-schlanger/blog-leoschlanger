@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart, Check } from 'lucide-react';
 import { getBlogPostBySlug } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
 import { useLanguage, translations } from '@/hooks/useLanguage';
@@ -11,6 +12,7 @@ import { PostImage } from '@/components/PostImage';
 export function Post() {
   const { slug } = useParams<{ slug: string }>();
   const { language, t } = useLanguage();
+  const [showCopied, setShowCopied] = useState(false);
 
   const { data: post, isLoading, error } = useQuery({
     queryKey: ['post', slug, language],
@@ -72,7 +74,8 @@ export function Post() {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert(t('Link copiado!', 'Link copied!'));
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
     }
   };
 
@@ -87,6 +90,8 @@ export function Post() {
         url={`/post/${currentSlug}`}
         type="article"
         publishedAt={post.published_at || post.created_at}
+        modifiedAt={post.created_at}
+        category={categoryLabel}
         tags={post.tags}
       />
 
@@ -134,10 +139,16 @@ export function Post() {
                 </span>
                 <button
                   onClick={sharePost}
-                  className="flex items-center gap-2 hover:text-cyber-green transition-colors"
+                  className="flex items-center gap-2 hover:text-cyber-green transition-colors relative"
                 >
-                  <Share2 className="h-5 w-5" />
-                  {t('Compartilhar', 'Share')}
+                  {showCopied ? (
+                    <Check className="h-5 w-5 text-cyber-green" />
+                  ) : (
+                    <Share2 className="h-5 w-5" />
+                  )}
+                  {showCopied
+                    ? t('Link copiado!', 'Link copied!')
+                    : t('Compartilhar', 'Share')}
                 </button>
               </div>
             </div>

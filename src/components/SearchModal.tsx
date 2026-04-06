@@ -77,16 +77,22 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-2xl mx-4 bg-cyber-dark border border-cyber-green/30 rounded-xl shadow-2xl shadow-cyber-green/10 overflow-hidden">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('Buscar posts', 'Search posts')}
+        className="relative w-full max-w-2xl mx-4 bg-cyber-dark border border-cyber-green/30 rounded-xl shadow-2xl shadow-cyber-green/10 overflow-hidden"
+      >
         {/* Search Input */}
         <div className="flex items-center border-b border-cyber-green/20">
           <Search className="w-5 h-5 text-cyber-green/60 ml-4" />
           <input
             ref={inputRef}
-            type="text"
+            type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t(translations.searchPlaceholder.pt, translations.searchPlaceholder.en)}
+            aria-label={t('Buscar posts no blog', 'Search blog posts')}
             className="flex-1 px-4 py-4 bg-transparent text-white placeholder-gray-500 focus:outline-none"
           />
           <button

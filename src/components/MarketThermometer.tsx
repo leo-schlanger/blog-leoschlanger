@@ -6,8 +6,7 @@ import {
   Activity,
   RefreshCw,
 } from 'lucide-react';
-
-const DATA_URL = 'https://raw.githubusercontent.com/leo-schlanger/market-thermo-cron/main/data/thermometer.json';
+import { MARKET_DATA_URL, MARKET_REFRESH_INTERVAL } from '@/lib/constants';
 
 interface ThermometerData {
   dashboard: {
@@ -51,7 +50,7 @@ export function MarketThermometer() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(DATA_URL, { cache: 'no-store' });
+      const res = await fetch(MARKET_DATA_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error();
       setData(await res.json());
       setError(false);
@@ -64,7 +63,7 @@ export function MarketThermometer() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    const interval = setInterval(fetchData, MARKET_REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, []);
 

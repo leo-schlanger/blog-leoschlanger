@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-
-const DATA_URL = 'https://raw.githubusercontent.com/leo-schlanger/market-thermo-cron/main/data/thermometer.json';
+import { MARKET_DATA_URL, MARKET_REFRESH_INTERVAL } from '@/lib/constants';
 
 interface CryptoPrice {
   symbol: string;
@@ -17,7 +16,7 @@ export function PriceTicker() {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const res = await fetch(DATA_URL, { cache: 'no-store' });
+        const res = await fetch(MARKET_DATA_URL, { cache: 'no-store' });
         if (!res.ok) throw new Error();
         const data = await res.json();
 
@@ -77,7 +76,7 @@ export function PriceTicker() {
     };
 
     fetchPrices();
-    const interval = setInterval(fetchPrices, 5 * 60 * 1000);
+    const interval = setInterval(fetchPrices, MARKET_REFRESH_INTERVAL);
     return () => clearInterval(interval);
   }, []);
 

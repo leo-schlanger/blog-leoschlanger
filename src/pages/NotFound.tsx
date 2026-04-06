@@ -14,6 +14,7 @@ export function NotFound() {
           'A página que você está procurando não existe.',
           'The page you are looking for does not exist.'
         )}
+        noindex
       />
 
       <div className="min-h-[70vh] flex items-center justify-center">

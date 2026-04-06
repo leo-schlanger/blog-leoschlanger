@@ -22,3 +22,14 @@ export const SEARCH_RESULTS_LIMIT = 10;
  * haja resultados suficientes para exibição.
  */
 export const SEARCH_QUERY_LIMIT = 20;
+
+/**
+ * URL do JSON de dados de mercado (thermometer).
+ * Utilizado por PriceTicker e MarketThermometer.
+ */
+export const MARKET_DATA_URL = 'https://raw.githubusercontent.com/leo-schlanger/market-thermo-cron/main/data/thermometer.json';
+
+/**
+ * Intervalo de atualização dos dados de mercado em milissegundos (5 minutos).
+ */
+export const MARKET_REFRESH_INTERVAL = 5 * 60 * 1000;

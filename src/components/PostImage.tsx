@@ -31,6 +31,8 @@ export function PostImage({ src, alt, category, postId, className }: PostImagePr
       alt={alt}
       className={cn(className)}
       onError={handleError}
+      loading="lazy"
+      decoding="async"
     />
   );
 }

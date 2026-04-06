@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
+Disallow: /assets/*.js$
+Disallow: /assets/*.css$
+
+# Allow AI citation crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Block AI training-only crawlers
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
 
 Sitemap: https://blog.leoschlanger.com/sitemap.xml

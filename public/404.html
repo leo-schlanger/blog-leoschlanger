@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Leo.Blog</title>
+    <script>
+      // GitHub Pages SPA redirect trick
+      // Saves the full URL and redirects to / so React Router can handle it
+      sessionStorage.redirect = location.href;
+      location.replace('/');
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { Briefcase, ExternalLink, LineChart, TrendingUp, Shield, Server } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 

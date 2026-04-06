@@ -7,7 +7,7 @@ import { CategoryTabs } from '@/components/CategoryTabs';
 import { PriceTicker } from '@/components/PriceTicker';
 import { Sidebar } from '@/components/Sidebar';
 import { SEO } from '@/components/SEO';
-import { getBlogPosts } from '@/lib/supabase';
+import { getBlogPosts, type BlogPost } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { POSTS_PER_PAGE } from '@/lib/constants';
 
@@ -15,7 +15,7 @@ export function Home() {
   const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [allPosts, setAllPosts] = useState<any[]>([]);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
 
   // Reset page when category changes
   useEffect(() => {

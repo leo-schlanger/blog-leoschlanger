@@ -1,0 +1,20 @@
+{
+  "name": "Leo.Blog - Crypto & Macro News",
+  "short_name": "Leo.Blog",
+  "description": "Blog de noticias sobre criptomoedas, economia global e mercados financeiros",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#00ff9d",
+  "orientation": "portrait-primary",
+  "categories": ["news", "finance", "business"],
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

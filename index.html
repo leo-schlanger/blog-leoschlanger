@@ -2,25 +2,68 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#00ff9d" />
-    <meta name="description" content="Blog de notícias sobre criptomoedas, economia global e mercados financeiros - Leo Schlanger" />
-    <meta name="keywords" content="crypto, bitcoin, ethereum, macroeconomia, fed, economia, mercados, fintech" />
+
+    <!-- SEO Crawling -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <link rel="canonical" href="https://blog.leoschlanger.com/" />
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="dns-prefetch" href="https://raw.githubusercontent.com" />
+    <link rel="dns-prefetch" href="https://s3.tradingview.com" />
+
+    <!-- Basic Meta -->
+    <meta name="description" content="Blog de noticias sobre criptomoedas, economia global e mercados financeiros - Leo Schlanger" />
+    <meta name="keywords" content="crypto, bitcoin, ethereum, macroeconomia, fed, economia, mercados, fintech, trading, defi, web3" />
     <meta name="author" content="Leo Schlanger" />
+    <meta name="rating" content="general" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Leo.Blog" />
-    <meta property="og:title" content="Leo.Blog - Notícias Cripto & Macro" />
-    <meta property="og:description" content="Blog de notícias sobre criptomoedas, economia global e mercados financeiros" />
+    <meta property="og:title" content="Leo.Blog - Crypto & Macro News" />
+    <meta property="og:description" content="Blog de noticias sobre criptomoedas, economia global e mercados financeiros" />
     <meta property="og:image" content="https://github.com/leo-schlanger.png" />
+    <meta property="og:image:width" content="460" />
+    <meta property="og:image:height" content="460" />
+    <meta property="og:image:alt" content="Leo.Blog - Crypto & Macro News" />
+    <meta property="og:url" content="https://blog.leoschlanger.com/" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:locale:alternate" content="en_US" />
 
-    <!-- Twitter -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@leo_schlanger" />
+    <meta name="twitter:creator" content="@leo_schlanger" />
+    <meta name="twitter:title" content="Leo.Blog - Crypto & Macro News" />
+    <meta name="twitter:description" content="Blog de noticias sobre criptomoedas, economia global e mercados financeiros" />
+    <meta name="twitter:image" content="https://github.com/leo-schlanger.png" />
+    <meta name="twitter:image:alt" content="Leo.Blog - Crypto & Macro News" />
 
-    <title>Leo.Blog - Notícias Cripto & Macro</title>
+    <!-- Favicon & PWA -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="Leo.Blog RSS" href="https://blog.leoschlanger.com/rss.xml" />
+
+    <title>Leo.Blog - Crypto & Macro News</title>
+
+    <!-- GitHub Pages SPA redirect handler -->
+    <script>
+      (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
