@@ -49,7 +49,7 @@ export function PriceTicker() {
           });
         }
 
-        if (data.dashboard?.vix) {
+        if (data.dashboard?.vix?.value != null) {
           cryptoPrices.push({
             symbol: 'VIX',
             price: data.dashboard.vix.value.toFixed(1),
@@ -58,7 +58,7 @@ export function PriceTicker() {
           });
         }
 
-        if (data.dashboard?.dxy) {
+        if (data.dashboard?.dxy?.value != null) {
           cryptoPrices.push({
             symbol: 'DXY',
             price: data.dashboard.dxy.value.toFixed(2),

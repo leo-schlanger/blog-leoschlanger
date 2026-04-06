@@ -176,7 +176,7 @@ export function MarketThermometer() {
         {/* VIX + DXY */}
         <div className="grid grid-cols-2 gap-3">
           {/* VIX */}
-          {dashboard.vix && (
+          {dashboard.vix?.value != null && (
             <div className="bg-cyber-dark/80 border border-cyber-green/20 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-cyber-green/70 text-xs font-medium tracking-wider">VIX</span>
@@ -200,7 +200,7 @@ export function MarketThermometer() {
           )}
 
           {/* DXY */}
-          {dashboard.dxy && (
+          {dashboard.dxy?.value != null && (
             <div className="bg-cyber-dark/80 border border-cyber-green/20 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-cyber-green/70 text-xs font-medium tracking-wider">DXY</span>
