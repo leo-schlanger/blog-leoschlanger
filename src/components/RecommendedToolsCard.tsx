@@ -1,4 +1,4 @@
-import { Briefcase, ExternalLink, LineChart, TrendingUp, Shield, Server } from 'lucide-react';
+import { Briefcase, ExternalLink, LineChart, Shield, Server } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 
 export function RecommendedToolsCard() {
@@ -27,23 +27,6 @@ export function RecommendedToolsCard() {
                             Hyperliquid
                         </p>
                         <p className="text-cyber-green/50 text-xs">Perpetual DEX (0 fees)</p>
-                    </div>
-                    <ExternalLink className="w-3 h-3 text-cyber-green/30 group-hover:text-cyber-green/70 opacity-0 group-hover:opacity-100 transition-all" />
-                </a>
-
-                {/* Drift Protocol */}
-                <a
-                    href="https://app.drift.trade/ref/viperinvest"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-3 rounded-lg bg-cyber-dark/80 border border-cyber-green/10 hover:border-cyber-green/50 hover:bg-cyber-green/5 transition-all group"
-                >
-                    <TrendingUp className="w-4 h-4 text-cyber-green/70 group-hover:text-cyber-green" />
-                    <div className="flex-1">
-                        <p className="text-white text-sm font-medium group-hover:text-cyber-green transition-colors">
-                            Drift Protocol
-                        </p>
-                        <p className="text-cyber-green/50 text-xs">Solana DeFi Trading</p>
                     </div>
                     <ExternalLink className="w-3 h-3 text-cyber-green/30 group-hover:text-cyber-green/70 opacity-0 group-hover:opacity-100 transition-all" />
                 </a>
