@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, ExternalLink, Code2, TrendingUp, Globe } from 'lucide-react';
+import { Github, Linkedin, ExternalLink, Code2, TrendingUp, Globe } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -59,15 +59,6 @@ export function About() {
               >
                 <Linkedin className="w-4 h-4" />
                 <span className="text-sm">LinkedIn</span>
-              </a>
-              <a
-                href="https://twitter.com/leo_schlanger"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-cyber-green/20 text-gray-400 hover:text-cyber-green hover:border-cyber-green/40 hover:bg-cyber-green/5 transition-all"
-              >
-                <Twitter className="w-4 h-4" />
-                <span className="text-sm">Twitter/X</span>
               </a>
               <a
                 href="https://leoschlanger.com"

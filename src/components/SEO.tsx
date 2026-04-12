@@ -19,7 +19,6 @@ const SITE_NAME = 'Leo.Blog';
 const DEFAULT_IMAGE = 'https://github.com/leo-schlanger.png';
 const BASE_URL = 'https://blog.leoschlanger.com';
 const AUTHOR_URL = 'https://leoschlanger.com';
-const TWITTER_HANDLE = '@leo_schlanger';
 
 export function SEO({
   title,
@@ -109,14 +108,8 @@ export function SEO({
     setMeta('og:locale', locale, true);
     setMeta('og:locale:alternate', alternateLocale, true);
 
-    // Twitter Card
+    // Twitter/X Card (uses OG tags as fallback for most fields)
     setMeta('twitter:card', 'summary_large_image');
-    setMeta('twitter:site', TWITTER_HANDLE);
-    setMeta('twitter:creator', TWITTER_HANDLE);
-    setMeta('twitter:title', fullTitle);
-    setMeta('twitter:description', finalDescription);
-    setMeta('twitter:image', image);
-    setMeta('twitter:image:alt', title || defaultTitle);
 
     // Article-specific
     if (type === 'article') {
@@ -221,8 +214,8 @@ export function SEO({
           name: author,
           url: AUTHOR_URL,
           sameAs: [
-            'https://twitter.com/leo_schlanger',
             'https://github.com/leo-schlanger',
+            'https://linkedin.com/in/leo-schlanger',
           ],
         },
       });
