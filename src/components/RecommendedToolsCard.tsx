@@ -9,7 +9,7 @@ export function RecommendedToolsCard() {
             <div className="flex items-center gap-2 mb-4">
                 <Briefcase className="w-5 h-5 text-cyber-green" />
                 <span className="text-cyber-green font-semibold tracking-wide text-sm">
-                    {t('TOOLS I USE', 'TOOLS I USE')}
+                    {t('FERRAMENTAS QUE USO', 'TOOLS I USE')}
                 </span>
             </div>
 

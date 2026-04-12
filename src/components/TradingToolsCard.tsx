@@ -12,7 +12,7 @@ export function TradingToolsCard() {
           <div className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-cyber-green" />
             <span className="text-cyber-green font-semibold tracking-wide text-sm">
-              TRADING TOOLS
+              {t('FERRAMENTAS DE TRADING', 'TRADING TOOLS')}
             </span>
           </div>
           <ChevronRight className="w-4 h-4 text-cyber-green/40 group-hover:text-cyber-green group-hover:translate-x-0.5 transition-all" />

@@ -99,12 +99,31 @@ export function Footer() {
                   {t('Apoiar', 'Support')}
                 </a>
               </li>
+              <li>
+                <Link
+                  to="/about"
+                  className="text-gray-400 hover:text-cyber-green text-sm transition-colors"
+                >
+                  {t('Sobre', 'About')}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-cyber-green/10 mt-8 pt-8 text-center text-gray-500 text-sm">
-          <p>© {currentYear} Leo Schlanger. {t('Todos os direitos reservados.', 'All rights reserved.')}</p>
+        <div className="border-t border-cyber-green/10 mt-8 pt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-gray-500 text-sm">
+            <p>© {currentYear} Leo Schlanger. {t('Todos os direitos reservados.', 'All rights reserved.')}</p>
+            <div className="flex items-center gap-4">
+              <Link to="/privacy" className="hover:text-cyber-green transition-colors">
+                {t('Privacidade', 'Privacy')}
+              </Link>
+              <span className="text-cyber-green/30">|</span>
+              <Link to="/terms" className="hover:text-cyber-green transition-colors">
+                {t('Termos de Uso', 'Terms of Use')}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

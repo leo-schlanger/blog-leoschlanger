@@ -7,6 +7,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { MARKET_DATA_URL, MARKET_REFRESH_INTERVAL } from '@/lib/constants';
+import { useLanguage } from '@/hooks/useLanguage';
 
 interface ThermometerData {
   dashboard: {
@@ -43,6 +44,7 @@ function ProgressBar({ value }: { value: number }) {
 }
 
 export function MarketThermometer() {
+  const { t } = useLanguage();
   const [data, setData] = useState<ThermometerData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -71,8 +73,8 @@ export function MarketThermometer() {
     return (
       <div className="cyber-card p-6 text-center">
         <AlertTriangle className="w-8 h-8 text-red-500 mx-auto mb-3" />
-        <p className="text-red-500 text-sm mb-3">Failed to load data</p>
-        <button onClick={fetchData} className="cyber-button text-xs">Retry</button>
+        <p className="text-red-500 text-sm mb-3">{t('Falha ao carregar dados', 'Failed to load data')}</p>
+        <button onClick={fetchData} className="cyber-button text-xs">{t('Tentar novamente', 'Retry')}</button>
       </div>
     );
   }
@@ -102,7 +104,7 @@ export function MarketThermometer() {
       <div className="flex items-center justify-between px-5 py-4 border-b border-cyber-green/20">
         <div className="flex items-center gap-2">
           <Activity className="w-5 h-5 text-cyber-green" />
-          <span className="text-cyber-green font-semibold tracking-wide">MARKET THERMOMETER</span>
+          <span className="text-cyber-green font-semibold tracking-wide">{t('TERMÔMETRO DE MERCADO', 'MARKET THERMOMETER')}</span>
         </div>
         <div className="flex items-center gap-3">
           {alerts.length > 0 && (
@@ -195,7 +197,7 @@ export function MarketThermometer() {
               }`}>
                 {dashboard.vix.value.toFixed(1)}
               </p>
-              <p className="text-cyber-green/50 text-xs mt-1">Volatility Index</p>
+              <p className="text-cyber-green/50 text-xs mt-1">{t('Índice de Volatilidade', 'Volatility Index')}</p>
             </div>
           )}
 
@@ -217,7 +219,7 @@ export function MarketThermometer() {
               }`}>
                 {dashboard.dxy.value.toFixed(1)}
               </p>
-              <p className="text-cyber-green/50 text-xs mt-1">Dollar Index</p>
+              <p className="text-cyber-green/50 text-xs mt-1">{t('Índice do Dólar', 'Dollar Index')}</p>
             </div>
           )}
         </div>

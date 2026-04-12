@@ -1,23 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart, Check } from 'lucide-react';
-import { getBlogPostBySlug } from '@/lib/supabase';
+import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart, Check, Bookmark } from 'lucide-react';
+import { getBlogPostBySlug, getRelatedPosts } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
 import { PostImage } from '@/components/PostImage';
+import { ReadingProgress } from '@/components/ReadingProgress';
+import { SocialShare } from '@/components/SocialShare';
+import { TableOfContents } from '@/components/TableOfContents';
+import { RelatedPosts } from '@/components/RelatedPosts';
+import { GiscusComments } from '@/components/GiscusComments';
+import { BookmarkButton } from '@/components/BookmarkButton';
+import { useReadingHistory } from '@/hooks/useReadingHistory';
 
 export function Post() {
   const { slug } = useParams<{ slug: string }>();
   const { language, t } = useLanguage();
   const [showCopied, setShowCopied] = useState(false);
+  const { addToHistory } = useReadingHistory();
 
   const { data: post, isLoading, error } = useQuery({
     queryKey: ['post', slug, language],
     queryFn: () => getBlogPostBySlug(slug!, language),
     enabled: !!slug,
+  });
+
+  // Track reading history
+  useEffect(() => {
+    if (post) {
+      const title = language === 'pt' ? post.title_pt : post.title_en;
+      const postSlug = language === 'pt' ? post.slug_pt : post.slug_en;
+      addToHistory({ id: post.id, slug: postSlug, title, category: post.category });
+    }
+  }, [post, language, addToHistory]);
+
+  // Fetch related posts
+  const { data: relatedPosts } = useQuery({
+    queryKey: ['related-posts', post?.id, post?.category],
+    queryFn: () => getRelatedPosts(post!.id, post!.category, post!.tags, language),
+    enabled: !!post,
   });
 
   if (isLoading) {
@@ -80,9 +104,12 @@ export function Post() {
   };
 
   const currentSlug = language === 'pt' ? post.slug_pt : post.slug_en;
+  const postUrl = `https://blog.leoschlanger.com/post/${currentSlug}`;
 
   return (
     <>
+      <ReadingProgress />
+
       <SEO
         title={title}
         description={summary}
@@ -113,9 +140,12 @@ export function Post() {
               </Link>
 
               {/* Category Badge */}
-              <span className="inline-block px-3 py-1 text-sm font-medium bg-cyber-green/10 text-cyber-green rounded mb-4">
+              <Link
+                to={`/category/${post.category}`}
+                className="inline-block px-3 py-1 text-sm font-medium bg-cyber-green/10 text-cyber-green rounded mb-4 hover:bg-cyber-green/20 transition-colors"
+              >
                 {categoryLabel}
-              </span>
+              </Link>
 
               {/* Title */}
               <h1 className="text-3xl md:text-5xl font-bold text-white mb-6">
@@ -128,7 +158,7 @@ export function Post() {
               </p>
 
               {/* Meta */}
-              <div className="flex flex-wrap items-center gap-6 text-gray-500">
+              <div className="flex flex-wrap items-center gap-4 text-gray-500">
                 <span className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
                   {formatDate(post.published_at || post.created_at, language === 'pt' ? 'pt-BR' : 'en-US')}
@@ -139,7 +169,7 @@ export function Post() {
                 </span>
                 <button
                   onClick={sharePost}
-                  className="flex items-center gap-2 hover:text-cyber-green transition-colors relative"
+                  className="flex items-center gap-2 hover:text-cyber-green transition-colors"
                 >
                   {showCopied ? (
                     <Check className="h-5 w-5 text-cyber-green" />
@@ -150,6 +180,7 @@ export function Post() {
                     ? t('Link copiado!', 'Link copied!')
                     : t('Compartilhar', 'Share')}
                 </button>
+                <BookmarkButton postId={post.id} />
               </div>
             </div>
           </div>
@@ -171,27 +202,51 @@ export function Post() {
         {/* Content */}
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-3xl mx-auto">
+            {/* Table of Contents */}
+            <TableOfContents content={content} />
+
+            {/* Article Content */}
             <div className="prose-cyber">
-              {content.split('\n\n').map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              {content.split('\n\n').map((paragraph, index) => {
+                // Check if paragraph is a heading
+                const headingMatch = paragraph.match(/^(#{2,3})\s+(.+)/);
+                if (headingMatch) {
+                  const level = headingMatch[1].length;
+                  const text = headingMatch[2];
+                  const id = text
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/(^-|-$)/g, '');
+                  const Tag = level === 2 ? 'h2' : 'h3';
+                  return <Tag key={index} id={id}>{text}</Tag>;
+                }
+                return <p key={index}>{paragraph}</p>;
+              })}
             </div>
 
-            {/* Tags */}
+            {/* Tags - Clickable */}
             {post.tags && post.tags.length > 0 && (
               <div className="mt-12 pt-8 border-t border-cyber-green/20">
                 <div className="flex flex-wrap gap-2">
                   {post.tags.map((tag) => (
-                    <span
+                    <Link
                       key={tag}
-                      className="px-3 py-1 text-sm bg-cyber-dark border border-cyber-green/20 rounded text-gray-400"
+                      to={`/?tag=${encodeURIComponent(tag)}`}
+                      className="px-3 py-1 text-sm bg-cyber-dark border border-cyber-green/20 rounded text-gray-400 hover:text-cyber-green hover:border-cyber-green/40 transition-colors"
                     >
                       #{tag}
-                    </span>
+                    </Link>
                   ))}
                 </div>
               </div>
             )}
+
+            {/* Social Share Buttons */}
+            <div className="mt-8 pt-6 border-t border-cyber-green/10">
+              <SocialShare title={title} summary={summary} url={postUrl} />
+            </div>
 
             {/* Source */}
             <div className="mt-8 p-4 bg-cyber-dark/50 rounded-lg border border-cyber-green/10">
@@ -231,6 +286,14 @@ export function Post() {
                 {t('Fazer uma doação', 'Make a donation')}
               </a>
             </div>
+
+            {/* Related Posts */}
+            {relatedPosts && relatedPosts.length > 0 && (
+              <RelatedPosts posts={relatedPosts} />
+            )}
+
+            {/* Comments */}
+            <GiscusComments />
           </div>
         </div>
       </article>

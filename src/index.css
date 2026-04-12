@@ -184,3 +184,22 @@
     display: none;
   }
 }
+
+/* Accessibility: visible focus indicators */
+@layer base {
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-cyber-green;
+  }
+}
+
+/* Accessibility: respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -174,6 +174,38 @@ export async function searchPosts(
   return data || [];
 }
 
+export async function getRelatedPosts(
+  postId: number,
+  category: string,
+  tags: string[],
+  language: 'pt' | 'en' = 'pt',
+  limit: number = 3
+): Promise<BlogPost[]> {
+  if (!supabase) {
+    return getMockPosts(language, limit).filter(p => p.id !== postId);
+  }
+
+  // First try: same category, excluding current post
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('status', 'published')
+    .eq('category', category)
+    .neq('id', postId)
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching related posts:', error);
+    return [];
+  }
+
+  return (data || []).map(post => ({
+    ...post,
+    tags: parseTags(post.tags)
+  }));
+}
+
 function getMockPosts(language: 'pt' | 'en', limit: number): BlogPost[] {
   const mockPosts: BlogPost[] = [
     {
