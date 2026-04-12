@@ -14,6 +14,7 @@ const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy').then(m => ({ de
 const TermsOfUse = lazy(() => import('@/pages/TermsOfUse').then(m => ({ default: m.TermsOfUse })));
 const Category = lazy(() => import('@/pages/Category').then(m => ({ default: m.Category })));
 const About = lazy(() => import('@/pages/About').then(m => ({ default: m.About })));
+const Briefing = lazy(() => import('@/pages/Briefing').then(m => ({ default: m.Briefing })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +51,7 @@ function AppContent() {
               <Route path="/post/:slug" element={<Post />} />
               <Route path="/category/:slug" element={<Category />} />
               <Route path="/about" element={<About />} />
+              <Route path="/briefing" element={<Briefing />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfUse />} />
               <Route path="*" element={<NotFound />} />

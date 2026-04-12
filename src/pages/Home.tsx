@@ -10,6 +10,7 @@ import { SEO } from '@/components/SEO';
 import { getBlogPosts, type BlogPost } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { POSTS_PER_PAGE } from '@/lib/constants';
+import { MarketAlertBanner } from '@/components/MarketAlertBanner';
 
 export function Home() {
   const { language, t } = useLanguage();
@@ -86,6 +87,9 @@ export function Home() {
 
         {/* Main Content */}
         <section className="container mx-auto px-4 pb-16">
+          {/* Market Alerts */}
+          <MarketAlertBanner />
+
           {/* Category Tabs */}
           <div className="mb-8">
             <CategoryTabs

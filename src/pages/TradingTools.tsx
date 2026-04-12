@@ -1,6 +1,7 @@
-import { Activity, Calendar, TrendingUp } from 'lucide-react';
+import { Activity, Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 import { MarketThermometer } from '@/components/MarketThermometer';
 import { EconomicCalendar } from '@/components/EconomicCalendar';
+import { TradingViewChart } from '@/components/TradingViewChart';
 import { SEO } from '@/components/SEO';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -60,6 +61,21 @@ export function TradingTools() {
                 </h2>
               </div>
               <EconomicCalendar defaultHeight={500} expandedHeight={700} />
+            </div>
+          </div>
+
+          {/* Interactive Charts */}
+          <div className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-4 h-4 text-cyber-green/70" />
+              <h2 className="text-sm font-medium text-cyber-green/70 tracking-wider">
+                {t('GRÁFICOS INTERATIVOS', 'INTERACTIVE CHARTS')}
+              </h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <TradingViewChart symbol="BINANCE:BTCUSDT" height={220} />
+              <TradingViewChart symbol="BINANCE:ETHUSDT" height={220} />
+              <TradingViewChart symbol="BINANCE:SOLUSDT" height={220} />
             </div>
           </div>
         </section>

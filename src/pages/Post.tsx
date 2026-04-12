@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart, Check, Bookmark } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart, Check } from 'lucide-react';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { getBlogPostBySlug, getRelatedPosts } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
 import { useLanguage, translations } from '@/hooks/useLanguage';
@@ -14,6 +16,7 @@ import { TableOfContents } from '@/components/TableOfContents';
 import { RelatedPosts } from '@/components/RelatedPosts';
 import { GiscusComments } from '@/components/GiscusComments';
 import { BookmarkButton } from '@/components/BookmarkButton';
+import { SentimentVote } from '@/components/SentimentVote';
 import { useReadingHistory } from '@/hooks/useReadingHistory';
 
 export function Post() {
@@ -207,23 +210,26 @@ export function Post() {
 
             {/* Article Content */}
             <div className="prose-cyber">
-              {content.split('\n\n').map((paragraph, index) => {
-                // Check if paragraph is a heading
-                const headingMatch = paragraph.match(/^(#{2,3})\s+(.+)/);
-                if (headingMatch) {
-                  const level = headingMatch[1].length;
-                  const text = headingMatch[2];
-                  const id = text
-                    .toLowerCase()
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/(^-|-$)/g, '');
-                  const Tag = level === 2 ? 'h2' : 'h3';
-                  return <Tag key={index} id={id}>{text}</Tag>;
-                }
-                return <p key={index}>{paragraph}</p>;
-              })}
+              <Markdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  h2: ({ children, ...props }) => {
+                    const text = String(children);
+                    const id = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    return <h2 id={id} {...props}>{children}</h2>;
+                  },
+                  h3: ({ children, ...props }) => {
+                    const text = String(children);
+                    const id = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                    return <h3 id={id} {...props}>{children}</h3>;
+                  },
+                  a: ({ href, children, ...props }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+                  ),
+                }}
+              >
+                {content}
+              </Markdown>
             </div>
 
             {/* Tags - Clickable */}
@@ -243,8 +249,9 @@ export function Post() {
               </div>
             )}
 
-            {/* Social Share Buttons */}
-            <div className="mt-8 pt-6 border-t border-cyber-green/10">
+            {/* Sentiment Vote + Social Share */}
+            <div className="mt-8 pt-6 border-t border-cyber-green/10 space-y-4">
+              <SentimentVote postId={post.id} />
               <SocialShare title={title} summary={summary} url={postUrl} />
             </div>
 

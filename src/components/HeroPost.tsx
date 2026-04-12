@@ -4,6 +4,8 @@ import { useLanguage, translations } from '@/hooks/useLanguage';
 import { formatDate, getReadingTime } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
 import { PostImage } from '@/components/PostImage';
+import { ImpactBadge } from '@/components/ImpactBadge';
+import { SentimentVote } from '@/components/SentimentVote';
 import type { BlogPost } from '@/lib/supabase';
 
 interface HeroPostProps {
@@ -44,9 +46,12 @@ export function HeroPost({ post }: HeroPostProps) {
 
             {/* Mobile overlay content */}
             <div className="absolute inset-0 flex flex-col justify-end p-6 lg:hidden">
-              <span className="inline-block px-3 py-1 text-xs font-medium bg-cyber-green/20 text-cyber-green rounded mb-3 w-fit backdrop-blur-sm">
-                {categoryLabel}
-              </span>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="inline-block px-3 py-1 text-xs font-medium bg-cyber-green/20 text-cyber-green rounded backdrop-blur-sm">
+                  {categoryLabel}
+                </span>
+                <ImpactBadge score={post.priority_score} compact />
+              </div>
               <h2 className="text-2xl font-bold text-white mb-2 line-clamp-2">
                 {title}
               </h2>
@@ -55,9 +60,12 @@ export function HeroPost({ post }: HeroPostProps) {
 
           {/* Content - Desktop */}
           <div className="hidden lg:flex flex-col justify-center p-8 lg:p-12">
-            <span className="inline-block px-3 py-1 text-xs font-medium bg-cyber-green/10 text-cyber-green rounded mb-4 w-fit">
-              {categoryLabel}
-            </span>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="inline-block px-3 py-1 text-xs font-medium bg-cyber-green/10 text-cyber-green rounded">
+                {categoryLabel}
+              </span>
+              <ImpactBadge score={post.priority_score} compact />
+            </div>
 
             <h2 className="text-3xl xl:text-4xl font-bold text-white mb-4 group-hover:text-cyber-green transition-colors line-clamp-3">
               {title}
@@ -76,6 +84,7 @@ export function HeroPost({ post }: HeroPostProps) {
                 <Clock className="h-4 w-4" />
                 {readingTime} {t(translations.readingTime.pt, translations.readingTime.en)}
               </span>
+              <SentimentVote postId={post.id} compact />
             </div>
 
             <div className="flex items-center gap-2 text-cyber-green font-semibold group-hover:gap-4 transition-all">

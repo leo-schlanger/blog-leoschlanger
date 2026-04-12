@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Globe, TrendingUp } from 'lucide-react';
+import { Search, Globe, TrendingUp, Rss, Sunrise } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { SearchModal } from './SearchModal';
@@ -10,6 +10,7 @@ export function Header() {
   const location = useLocation();
 
   const isToolsPage = location.pathname === '/tools';
+  const isBriefingPage = location.pathname === '/briefing';
 
   return (
     <>
@@ -38,6 +39,28 @@ export function Header() {
                 <TrendingUp className="h-4 w-4" />
                 <span className="hidden sm:inline text-xs font-medium">Tools</span>
               </Link>
+              {/* Briefing Link */}
+              <Link
+                to="/briefing"
+                className={`flex items-center space-x-1.5 px-2.5 py-1.5 text-sm rounded-lg transition-colors ${
+                  isBriefingPage
+                    ? 'bg-cyber-green/20 text-cyber-green'
+                    : 'text-gray-400 hover:text-cyber-green hover:bg-cyber-green/10'
+                }`}
+              >
+                <Sunrise className="h-4 w-4" />
+                <span className="hidden sm:inline text-xs font-medium">Briefing</span>
+              </Link>
+              {/* RSS Feed */}
+              <a
+                href="/rss.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-gray-400 hover:text-cyber-green transition-colors rounded-lg hover:bg-cyber-green/10"
+                aria-label="RSS Feed"
+              >
+                <Rss className="h-4 w-4" />
+              </a>
               {/* Search */}
               <button
                 onClick={() => setIsSearchOpen(true)}
