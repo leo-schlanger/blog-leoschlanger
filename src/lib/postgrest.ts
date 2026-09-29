@@ -33,6 +33,15 @@ export function sanitizeSearchTerm(query: string): string {
 }
 
 /**
+ * Palavras de um termo já sanitizado, para busca "todas as palavras em
+ * qualquer ordem". Descarta palavras de 1 caractere e limita a quantidade.
+ */
+export function searchWords(term: string, max = 5): string[] {
+  const words = term.split(' ').filter(w => w.length >= 2);
+  return [...new Set(words)].slice(0, max);
+}
+
+/**
  * Monta um valor `ilike` seguro para uso dentro de `.or()`.
  * O termo deve ter passado por `sanitizeSearchTerm`; as aspas duplas
  * protegem espaços e pontos na gramática do PostgREST.

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { POSTS_PER_PAGE, SEARCH_QUERY_LIMIT } from '@/lib/constants';
 import { fillMissingTranslations } from '@/lib/translation';
-import { ilikeContains, isValidSlug, sanitizeSearchTerm, tagContainsPattern } from '@/lib/postgrest';
+import { ilikeContains, isValidSlug, sanitizeSearchTerm, searchWords, tagContainsPattern } from '@/lib/postgrest';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -176,22 +176,30 @@ export async function searchPosts(
   if (term.length < 2) return [];
 
   if (!supabase) {
-    const needle = term.toLowerCase();
-    return getMockPosts(language, 10).filter(p =>
-      p.title_pt.toLowerCase().includes(needle) ||
-      p.title_en.toLowerCase().includes(needle)
-    );
+    const words = searchWords(term.toLowerCase());
+    return getMockPosts(language, 10).filter(p => {
+      const haystack = `${p.title_pt} ${p.title_en}`.toLowerCase();
+      return words.length > 0 && words.every(w => haystack.includes(w));
+    });
   }
 
   const titleField = language === 'pt' ? 'title_pt' : 'title_en';
   const contentField = language === 'pt' ? 'content_pt' : 'content_en';
-  const pattern = ilikeContains(term);
+  const words = searchWords(term);
+  if (words.length === 0) return [];
 
-  const { data, error } = await supabase
+  // Cada palavra deve aparecer no título ou no conteúdo; múltiplos
+  // filtros `or` são combinados com AND pelo PostgREST.
+  let request = supabase
     .from('blog_posts')
     .select('*')
-    .eq('status', 'published')
-    .or(`${titleField}.ilike.${pattern},${contentField}.ilike.${pattern}`)
+    .eq('status', 'published');
+  for (const word of words) {
+    const pattern = ilikeContains(word);
+    request = request.or(`${titleField}.ilike.${pattern},${contentField}.ilike.${pattern}`);
+  }
+
+  const { data, error } = await request
     .order('published_at', { ascending: false })
     .limit(SEARCH_QUERY_LIMIT);
 

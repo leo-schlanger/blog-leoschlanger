@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { fillMissingTranslations } from '../src/lib/translation';
-import { ilikeContains, isValidSlug, sanitizeSearchTerm, tagContainsPattern } from '../src/lib/postgrest';
+import { ilikeContains, isValidSlug, sanitizeSearchTerm, searchWords, tagContainsPattern } from '../src/lib/postgrest';
 
 test('isValidSlug aceita kebab-case ASCII', () => {
   assert.equal(isValidSlug('fed-mantem-taxas-2026'), true);
@@ -71,4 +71,11 @@ test('fillMissingTranslations usa o outro idioma quando falta tradução', () =>
   assert.equal(post.summary_pt, 'Summary');
   assert.equal(post.content_en, 'Texto');
   assert.equal(post.id, 1);
+});
+
+test('searchWords separa, deduplica e limita palavras', () => {
+  assert.deepEqual(searchWords(sanitizeSearchTerm('fed, juros')), ['fed', 'juros']);
+  assert.deepEqual(searchWords('a fed fed btc'), ['fed', 'btc']);
+  assert.deepEqual(searchWords('a b c d e f g h', 5), []);
+  assert.equal(searchWords('um dois tres quatro cinco seis').length, 5);
 });
