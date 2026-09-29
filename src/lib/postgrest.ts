@@ -6,9 +6,15 @@
  * permitem injetar condições). Tudo que vem da URL ou do input passa aqui.
  */
 
-const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/**
+ * Só letras minúsculas ASCII, dígitos e hífen: nada que o PostgREST
+ * interprete (`,` `.` `(` `)` `"` `:`) nem que forme caminho de arquivo.
+ * Hífens repetidos ou nas pontas são aceitos: o pipeline corta slugs
+ * longos em 100 caracteres e pode deixar um hífen no final.
+ */
+const SLUG_PATTERN = /^[a-z0-9-]+$/;
 
-/** Slugs de post são sempre kebab-case ASCII. */
+/** Slug seguro para filtros PostgREST e nomes de arquivo. */
 export function isValidSlug(slug: string): boolean {
   return slug.length > 0 && slug.length <= 300 && SLUG_PATTERN.test(slug);
 }

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { fillMissingTranslations } from '../../src/lib/translation';
 
 export interface PublishedPost {
   id: number;
@@ -75,7 +76,7 @@ export async function fetchAllPublishedPosts(): Promise<PublishedPost[] | null> 
 
     const rows = (data ?? []) as unknown as Array<Omit<PublishedPost, 'tags'> & { tags: unknown }>;
     for (const row of rows) {
-      posts.push({ ...row, tags: parseTags(row.tags) });
+      posts.push(fillMissingTranslations({ ...row, tags: parseTags(row.tags) }));
     }
     if (rows.length === 0) break;
     offset += rows.length;

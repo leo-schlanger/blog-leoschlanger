@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { POSTS_PER_PAGE, SEARCH_QUERY_LIMIT } from '@/lib/constants';
+import { fillMissingTranslations } from '@/lib/translation';
 import { ilikeContains, isValidSlug, sanitizeSearchTerm, tagContainsPattern } from '@/lib/postgrest';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -124,7 +125,7 @@ export async function getCategoryCounts(
 }
 
 function normalizePost(post: BlogPost & { tags: string | string[] | null }): BlogPost {
-  return { ...post, tags: parseTags(post.tags) };
+  return fillMissingTranslations({ ...post, tags: parseTags(post.tags) });
 }
 
 function parseTags(tags: string | string[] | null): string[] {
