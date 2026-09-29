@@ -13,26 +13,32 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Leo.Blog - Crypto & Macro News',
         short_name: 'Leo.Blog',
-        description: 'News and analysis on cryptocurrencies, global economy and financial markets.',
+        description: 'Notícias e análises sobre criptomoedas, economia global e mercados financeiros.',
+        lang: 'pt-BR',
         theme_color: '#00ff9d',
         background_color: '#0a0a0a',
         display: 'standalone',
+        orientation: 'portrait-primary',
+        categories: ['news', 'finance', 'business'],
         start_url: '/',
         icons: [
-          {
-            src: '/favicon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any maskable',
-          },
+          { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+          { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: '/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        // Só o shell da SPA: as páginas pré-renderizadas (post/, category/)
+        // são geradas depois do build e não devem entrar no precache.
+        globPatterns: ['**/*.{js,css,svg,ico,woff2}', 'index.html', 'icon-*.png'],
+        navigateFallback: '/index.html',
+        // Feeds e sitemap precisam vir sempre da rede
+        navigateFallbackDenylist: [/\.xml$/],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,

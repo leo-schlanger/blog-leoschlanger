@@ -3,11 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && npm run postbuild",
-    "postbuild": "npx tsx scripts/generate-sitemap.ts && npx tsx scripts/generate-rss.ts",
+    "build": "tsc -b && vite build && tsx scripts/prerender.ts",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
+    "test": "tsx --test \"tests/**/*.test.ts\"",
+    "check": "npm run typecheck && npm run lint && npm test",
     "preview": "vite preview"
   },
   "dependencies": {

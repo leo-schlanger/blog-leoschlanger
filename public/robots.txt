@@ -1,16 +1,16 @@
+# JS e CSS precisam ficar liberados: o site é uma SPA e os buscadores
+# executam o JavaScript para renderizar o conteúdo.
 User-agent: *
 Allow: /
-Disallow: /assets/*.js$
-Disallow: /assets/*.css$
 
-# Allow AI citation crawlers
+# Crawlers de citação por IA
 User-agent: GPTBot
 Allow: /
 
 User-agent: anthropic-ai
 Allow: /
 
-# Block AI training-only crawlers
+# Crawlers usados apenas para treino de IA
 User-agent: Google-Extended
 Disallow: /
 
