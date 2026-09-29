@@ -50,15 +50,20 @@ async function main(): Promise<void> {
 
   // Slugs inválidos viram nomes de arquivo: descartados com aviso
   const posts: PublishedPost[] = [];
-  let skipped = 0;
+  const skipped: PublishedPost[] = [];
   for (const post of fetched ?? []) {
     if (isValidSlug(post.slug_pt) && isValidSlug(post.slug_en) && CATEGORY_PATTERN.test(post.category)) {
       posts.push(post);
     } else {
-      skipped++;
+      skipped.push(post);
     }
   }
-  if (skipped > 0) console.warn(`⚠ ${skipped} post(s) ignorado(s) por slug/categoria inválidos.`);
+  if (skipped.length > 0) {
+    console.warn(`⚠ ${skipped.length} post(s) ignorado(s) por slug/categoria inválidos. Exemplos:`);
+    for (const post of skipped.slice(0, 15)) {
+      console.warn('  ' + JSON.stringify({ id: post.id, slug_pt: post.slug_pt, slug_en: post.slug_en, category: post.category }));
+    }
+  }
 
   // Páginas fixas
   for (const route of STATIC_ROUTES) {
