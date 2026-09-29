@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect, useRef, type ReactNode } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, Clock, ArrowLeft, ExternalLink, Share2, Heart, Check } from 'lucide-react';
 import Markdown from 'react-markdown';
@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm';
 import { getBlogPostBySlug, getRelatedPosts } from '@/lib/supabase';
 import { SEO } from '@/components/SEO';
 import { useLanguage, translations } from '@/hooks/useLanguage';
-import { formatDate, getReadingTime } from '@/lib/utils';
+import { formatDate, getReadingTime, slugify } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
 import { PostImage } from '@/components/PostImage';
 import { ReadingProgress } from '@/components/ReadingProgress';
@@ -19,31 +19,63 @@ import { BookmarkButton } from '@/components/BookmarkButton';
 import { SentimentVote } from '@/components/SentimentVote';
 import { useReadingHistory } from '@/hooks/useReadingHistory';
 
+/** Texto puro dos filhos de um heading renderizado pelo react-markdown. */
+function nodeText(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(nodeText).join('');
+  if (node && typeof node === 'object' && 'props' in node) {
+    return nodeText((node.props as { children?: ReactNode }).children);
+  }
+  return '';
+}
+
 export function Post() {
   const { slug } = useParams<{ slug: string }>();
   const { language, t } = useLanguage();
+  const navigate = useNavigate();
   const [showCopied, setShowCopied] = useState(false);
   const { addToHistory } = useReadingHistory();
 
-  const { data: post, isLoading, error } = useQuery({
-    queryKey: ['post', slug, language],
+  const { data: post, isLoading, isError, refetch } = useQuery({
+    queryKey: ['post', slug],
     queryFn: () => getBlogPostBySlug(slug!, language),
     enabled: !!slug,
   });
 
+  // A URL define o idioma do conteúdo: cada slug é uma página indexável
+  // no seu idioma (coerente com o HTML pré-renderizado e o hreflang).
+  const contentLanguage: 'pt' | 'en' =
+    post && slug === post.slug_en && slug !== post.slug_pt
+      ? 'en'
+      : post && slug === post.slug_pt
+        ? 'pt'
+        : language;
+
+  // Troca de idioma na interface leva ao slug equivalente do post.
+  const previousLanguage = useRef(language);
+  useEffect(() => {
+    if (previousLanguage.current === language) return;
+    previousLanguage.current = language;
+    if (!post) return;
+    const target = language === 'pt' ? post.slug_pt : post.slug_en;
+    if (target && target !== slug) {
+      navigate(`/post/${target}`, { replace: true });
+    }
+  }, [language, post, slug, navigate]);
+
   // Track reading history
   useEffect(() => {
     if (post) {
-      const title = language === 'pt' ? post.title_pt : post.title_en;
-      const postSlug = language === 'pt' ? post.slug_pt : post.slug_en;
+      const title = contentLanguage === 'pt' ? post.title_pt : post.title_en;
+      const postSlug = contentLanguage === 'pt' ? post.slug_pt : post.slug_en;
       addToHistory({ id: post.id, slug: postSlug, title, category: post.category });
     }
-  }, [post, language, addToHistory]);
+  }, [post, contentLanguage, addToHistory]);
 
   // Fetch related posts
   const { data: relatedPosts } = useQuery({
     queryKey: ['related-posts', post?.id, post?.category],
-    queryFn: () => getRelatedPosts(post!.id, post!.category, post!.tags, language),
+    queryFn: () => getRelatedPosts(post!.id, post!.category, contentLanguage),
     enabled: !!post,
   });
 
@@ -66,7 +98,20 @@ export function Post() {
     );
   }
 
-  if (error || !post) {
+  if (isError) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-2xl font-bold text-white mb-4">
+          {t('Não foi possível carregar o artigo.', 'Could not load the article.')}
+        </h1>
+        <button onClick={() => refetch()} className="cyber-button inline-flex items-center gap-2">
+          {t('Tentar novamente', 'Try again')}
+        </button>
+      </div>
+    );
+  }
+
+  if (!post) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-white mb-4">
@@ -80,9 +125,9 @@ export function Post() {
     );
   }
 
-  const title = language === 'pt' ? post.title_pt : post.title_en;
-  const content = language === 'pt' ? post.content_pt : post.content_en;
-  const summary = language === 'pt' ? post.summary_pt : post.summary_en;
+  const title = contentLanguage === 'pt' ? post.title_pt : post.title_en;
+  const content = contentLanguage === 'pt' ? post.content_pt : post.content_en;
+  const summary = contentLanguage === 'pt' ? post.summary_pt : post.summary_en;
 
   const readingTime = getReadingTime(content);
   const categoryLabel = translations[post.category as keyof typeof translations]
@@ -106,7 +151,7 @@ export function Post() {
     }
   };
 
-  const currentSlug = language === 'pt' ? post.slug_pt : post.slug_en;
+  const currentSlug = contentLanguage === 'pt' ? post.slug_pt : post.slug_en;
   const postUrl = `https://blog.leoschlanger.com/post/${currentSlug}`;
 
   return (
@@ -123,6 +168,8 @@ export function Post() {
         modifiedAt={post.created_at}
         category={categoryLabel}
         tags={post.tags}
+        contentLanguage={contentLanguage}
+        alternates={{ pt: `/post/${post.slug_pt}`, en: `/post/${post.slug_en}` }}
       />
 
       <article className="min-h-screen">
@@ -164,7 +211,7 @@ export function Post() {
               <div className="flex flex-wrap items-center gap-4 text-gray-500">
                 <span className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
-                  {formatDate(post.published_at || post.created_at, language === 'pt' ? 'pt-BR' : 'en-US')}
+                  {formatDate(post.published_at || post.created_at, contentLanguage === 'pt' ? 'pt-BR' : 'en-US')}
                 </span>
                 <span className="flex items-center gap-2">
                   <Clock className="h-5 w-5" />
@@ -209,21 +256,17 @@ export function Post() {
             <TableOfContents content={content} />
 
             {/* Article Content */}
-            <div className="prose-cyber">
+            <div className="prose-cyber" lang={contentLanguage === 'pt' ? 'pt-BR' : 'en'}>
               <Markdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  h2: ({ children, ...props }) => {
-                    const text = String(children);
-                    const id = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                    return <h2 id={id} {...props}>{children}</h2>;
-                  },
-                  h3: ({ children, ...props }) => {
-                    const text = String(children);
-                    const id = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                    return <h3 id={id} {...props}>{children}</h3>;
-                  },
-                  a: ({ href, children, ...props }) => (
+                  h2: ({ children, node: _node, ...props }) => (
+                    <h2 id={slugify(nodeText(children))} {...props}>{children}</h2>
+                  ),
+                  h3: ({ children, node: _node, ...props }) => (
+                    <h3 id={slugify(nodeText(children))} {...props}>{children}</h3>
+                  ),
+                  a: ({ href, children, node: _node, ...props }) => (
                     <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
                   ),
                 }}
@@ -252,7 +295,7 @@ export function Post() {
             {/* Sentiment Vote + Social Share */}
             <div className="mt-8 pt-6 border-t border-cyber-green/10 space-y-4">
               <SentimentVote postId={post.id} />
-              <SocialShare title={title} summary={summary} url={postUrl} />
+              <SocialShare title={title} url={postUrl} />
             </div>
 
             {/* Source */}
@@ -300,7 +343,7 @@ export function Post() {
             )}
 
             {/* Comments */}
-            <GiscusComments />
+            <GiscusComments term={`post-${post.id}`} />
           </div>
         </div>
       </article>

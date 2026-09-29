@@ -29,9 +29,10 @@ export function EconomicCalendar({
   const currentHeight = isExpanded ? expandedHeight : defaultHeight;
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    containerRef.current.innerHTML = '';
+    container.innerHTML = '';
 
     const widgetContainer = document.createElement('div');
     widgetContainer.className = 'tradingview-widget-container';
@@ -59,12 +60,10 @@ export function EconomicCalendar({
     });
 
     widgetContainer.appendChild(script);
-    containerRef.current.appendChild(widgetContainer);
+    container.appendChild(widgetContainer);
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
-      }
+      container.innerHTML = '';
     };
   }, [locale, importance, isExpanded]);
 

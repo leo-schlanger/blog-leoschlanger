@@ -1,44 +1,24 @@
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { Loader2, ChevronDown, ArrowLeft } from 'lucide-react';
 import { BlogCard } from '@/components/BlogCard';
 import { SEO } from '@/components/SEO';
-import { getBlogPosts, type BlogPost } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
-import { POSTS_PER_PAGE } from '@/lib/constants';
+import { usePaginatedPosts } from '@/hooks/usePaginatedPosts';
 
 export function Category() {
   const { slug } = useParams<{ slug: string }>();
   const { language, t } = useLanguage();
-  const [page, setPage] = useState(1);
-  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
 
-  useEffect(() => {
-    setPage(1);
-    setAllPosts([]);
-  }, [slug, language]);
-
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['category-posts', language, page, slug],
-    queryFn: () => getBlogPosts(language, POSTS_PER_PAGE, page, slug),
-    enabled: !!slug,
-  });
-
-  useEffect(() => {
-    if (data?.posts) {
-      if (page === 1) {
-        setAllPosts(data.posts);
-      } else {
-        setAllPosts(prev => {
-          const newPosts = data.posts.filter(
-            post => !prev.some(p => p.id === post.id)
-          );
-          return [...prev, ...newPosts];
-        });
-      }
-    }
-  }, [data, page]);
+  const {
+    posts: allPosts,
+    total,
+    isLoading,
+    isError,
+    refetch,
+    hasNextPage: hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = usePaginatedPosts(language, { category: slug }, !!slug);
 
   const categoryLabel = slug && translations[slug as keyof typeof translations]
     ? t(
@@ -46,8 +26,6 @@ export function Category() {
         (translations[slug as keyof typeof translations] as { pt: string; en: string }).en
       )
     : slug || '';
-
-  const hasMore = data?.hasMore ?? false;
 
   return (
     <>
@@ -74,15 +52,15 @@ export function Category() {
             <h1 className="text-3xl font-bold text-white">
               {categoryLabel}
             </h1>
-            {data && (
+            {total > 0 && (
               <p className="text-gray-400 mt-2">
-                {data.total} {t('notícias', 'news')}
+                {total} {t('notícias', 'news')}
               </p>
             )}
           </div>
 
           {/* Posts Grid */}
-          {isLoading && page === 1 ? (
+          {isLoading ? (
             <div className="flex items-center justify-center min-h-[30vh]">
               <Loader2 className="h-8 w-8 animate-spin text-cyber-green" />
             </div>
@@ -97,11 +75,11 @@ export function Category() {
               {hasMore && (
                 <div className="mt-8 text-center">
                   <button
-                    onClick={() => setPage(prev => prev + 1)}
-                    disabled={isFetching}
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
                     className="cyber-button inline-flex items-center gap-2"
                   >
-                    {isFetching ? (
+                    {isFetchingNextPage ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <ChevronDown className="h-4 w-4" />
@@ -111,6 +89,15 @@ export function Category() {
                 </div>
               )}
             </>
+          ) : isError ? (
+            <div className="text-center py-12">
+              <p className="text-red-400 mb-4">
+                {t('Não foi possível carregar as notícias.', 'Could not load the news.')}
+              </p>
+              <button onClick={() => refetch()} className="cyber-button">
+                {t('Tentar novamente', 'Try again')}
+              </button>
+            </div>
           ) : (
             <p className="text-gray-400 text-center py-12">
               {t(translations.noResults.pt, translations.noResults.en)}

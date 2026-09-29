@@ -1,86 +1,50 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import { MARKET_DATA_URL, MARKET_REFRESH_INTERVAL } from '@/lib/constants';
+import { useMarketData } from '@/hooks/useMarketData';
+import { USD_INDEX_LABEL } from '@/lib/constants';
 
-interface CryptoPrice {
+interface TickerItem {
   symbol: string;
   price: string;
   change: number;
   changeFormatted: string;
+  kind: 'change' | 'zone';
 }
 
 export function PriceTicker() {
-  const [prices, setPrices] = useState<CryptoPrice[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading: loading } = useMarketData();
 
-  useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        const res = await fetch(MARKET_DATA_URL, { cache: 'no-store' });
-        if (!res.ok) throw new Error();
-        const data = await res.json();
+  const prices = useMemo<TickerItem[]>(() => {
+    if (!data) return [];
+    const items: TickerItem[] = [];
 
-        const cryptoPrices: CryptoPrice[] = [];
-
-        if (data.crypto?.BTC) {
-          cryptoPrices.push({
-            symbol: 'BTC',
-            price: data.crypto.BTC.priceFormatted,
-            change: data.crypto.BTC.change24h,
-            changeFormatted: data.crypto.BTC.changeFormatted,
-          });
-        }
-
-        if (data.crypto?.ETH) {
-          cryptoPrices.push({
-            symbol: 'ETH',
-            price: data.crypto.ETH.priceFormatted,
-            change: data.crypto.ETH.change24h,
-            changeFormatted: data.crypto.ETH.changeFormatted,
-          });
-        }
-
-        if (data.crypto?.SOL) {
-          cryptoPrices.push({
-            symbol: 'SOL',
-            price: data.crypto.SOL.priceFormatted,
-            change: data.crypto.SOL.change24h,
-            changeFormatted: data.crypto.SOL.changeFormatted,
-          });
-        }
-
-        if (data.dashboard?.vix?.value != null) {
-          cryptoPrices.push({
-            symbol: 'VIX',
-            price: data.dashboard.vix.value.toFixed(1),
-            change: 0,
-            changeFormatted: data.dashboard.vix.zone,
-          });
-        }
-
-        if (data.dashboard?.dxy?.value != null) {
-          cryptoPrices.push({
-            symbol: 'DXY',
-            price: data.dashboard.dxy.value.toFixed(2),
-            change: 0,
-            changeFormatted: data.dashboard.dxy.zone,
-          });
-        }
-
-        setPrices(cryptoPrices);
-      } catch {
-        // Silently fail - ticker is not critical
-      } finally {
-        setLoading(false);
+    for (const symbol of ['BTC', 'ETH', 'SOL'] as const) {
+      const coin = data.crypto?.[symbol];
+      if (coin) {
+        items.push({
+          symbol,
+          price: coin.priceFormatted,
+          change: coin.change24h,
+          changeFormatted: coin.changeFormatted,
+          kind: 'change',
+        });
       }
-    };
+    }
 
-    fetchPrices();
-    const interval = setInterval(fetchPrices, MARKET_REFRESH_INTERVAL);
-    return () => clearInterval(interval);
-  }, []);
+    const { vix, dxy } = data.dashboard;
+    if (vix?.value != null) {
+      items.push({ symbol: 'VIX', price: vix.value.toFixed(1), change: 0, changeFormatted: vix.zone, kind: 'zone' });
+    }
+    if (dxy?.value != null) {
+      items.push({ symbol: USD_INDEX_LABEL, price: dxy.value.toFixed(2), change: 0, changeFormatted: dxy.zone, kind: 'zone' });
+    }
 
-  if (loading || prices.length === 0) {
+    return items;
+  }, [data]);
+
+  if (!loading && prices.length === 0) return null;
+
+  if (loading) {
     return (
       <div className="bg-cyber-dark/80 border-b border-cyber-green/20">
         <div className="container mx-auto px-4">
@@ -108,7 +72,7 @@ export function PriceTicker() {
             >
               <span className="text-cyber-green font-semibold">{item.symbol}</span>
               <span className="text-white">{item.price}</span>
-              {item.symbol === 'VIX' || item.symbol === 'DXY' ? (
+              {item.kind === 'zone' ? (
                 <span className={`text-xs px-1.5 py-0.5 rounded ${
                   item.changeFormatted === 'EXTREME' || item.changeFormatted === 'STRONG'
                     ? 'text-red-400 bg-red-500/10'

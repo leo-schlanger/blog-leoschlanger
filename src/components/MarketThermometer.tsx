@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -6,25 +5,9 @@ import {
   Activity,
   RefreshCw,
 } from 'lucide-react';
-import { MARKET_DATA_URL, MARKET_REFRESH_INTERVAL } from '@/lib/constants';
 import { useLanguage } from '@/hooks/useLanguage';
-
-interface ThermometerData {
-  dashboard: {
-    fearGreed: { value: number; classification: string; signal: string } | null;
-    vix: { value: number; zone: string } | null;
-    dxy: { value: number; zone: string; impact: string } | null;
-    bitcoin: { price: number; priceFormatted: string; change24h: number; changeFormatted: string } | null;
-  };
-  crypto: {
-    BTC: { priceFormatted: string; change24h: number; changeFormatted: string } | null;
-    ETH: { priceFormatted: string; change24h: number; changeFormatted: string } | null;
-    SOL: { priceFormatted: string; change24h: number; changeFormatted: string } | null;
-    global: { totalMarketCapFormatted: string; btcDominance: string } | null;
-  };
-  alerts: Array<{ level: string; title: string; message: string }>;
-  meta: { updatedAt: string };
-}
+import { useMarketData } from '@/hooks/useMarketData';
+import { USD_INDEX_LABEL } from '@/lib/constants';
 
 function TrendIcon({ value }: { value: number }) {
   return value >= 0
@@ -45,29 +28,8 @@ function ProgressBar({ value }: { value: number }) {
 
 export function MarketThermometer() {
   const { t } = useLanguage();
-  const [data, setData] = useState<ThermometerData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(MARKET_DATA_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error();
-      setData(await res.json());
-      setError(false);
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, MARKET_REFRESH_INTERVAL);
-    return () => clearInterval(interval);
-  }, []);
+  const { data, isFetching: loading, isError: error, refetch } = useMarketData();
+  const fetchData = () => { void refetch(); };
 
   if (error && !data) {
     return (
@@ -96,7 +58,8 @@ export function MarketThermometer() {
 
   if (!data) return null;
 
-  const { dashboard, crypto, alerts } = data;
+  const { dashboard, alerts } = data;
+  const crypto = data.crypto;
 
   return (
     <div className="cyber-card overflow-hidden">
@@ -117,6 +80,7 @@ export function MarketThermometer() {
             onClick={fetchData}
             disabled={loading}
             className="p-1.5 rounded hover:bg-cyber-green/10 transition-colors"
+            aria-label={t('Atualizar dados', 'Refresh data')}
           >
             <RefreshCw className={`w-4 h-4 text-cyber-green/60 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -175,7 +139,7 @@ export function MarketThermometer() {
           )}
         </div>
 
-        {/* VIX + DXY */}
+        {/* VIX + Dólar */}
         <div className="grid grid-cols-2 gap-3">
           {/* VIX */}
           {dashboard.vix?.value != null && (
@@ -201,11 +165,11 @@ export function MarketThermometer() {
             </div>
           )}
 
-          {/* DXY */}
+          {/* Índice amplo do dólar */}
           {dashboard.dxy?.value != null && (
             <div className="bg-cyber-dark/80 border border-cyber-green/20 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-cyber-green/70 text-xs font-medium tracking-wider">DXY</span>
+                <span className="text-cyber-green/70 text-xs font-medium tracking-wider">{USD_INDEX_LABEL.toUpperCase()}</span>
                 <span className={`text-xs font-medium ${
                   dashboard.dxy.zone === 'STRONG' ? 'text-red-500' :
                   dashboard.dxy.zone === 'WEAK' ? 'text-cyber-green' :
@@ -219,7 +183,7 @@ export function MarketThermometer() {
               }`}>
                 {dashboard.dxy.value.toFixed(1)}
               </p>
-              <p className="text-cyber-green/50 text-xs mt-1">{t('Índice do Dólar', 'Dollar Index')}</p>
+              <p className="text-cyber-green/50 text-xs mt-1">{t('Dólar amplo (FRED)', 'Broad dollar (FRED)')}</p>
             </div>
           )}
         </div>
@@ -227,7 +191,7 @@ export function MarketThermometer() {
         {/* Crypto Row */}
         <div className="grid grid-cols-3 gap-3">
           {(['BTC', 'ETH', 'SOL'] as const).map((symbol) => {
-            const coin = crypto[symbol];
+            const coin = crypto?.[symbol];
             if (!coin) return null;
             return (
               <div key={symbol} className="bg-cyber-dark/80 border border-cyber-green/20 rounded-lg p-3">
@@ -247,7 +211,7 @@ export function MarketThermometer() {
         </div>
 
         {/* Footer */}
-        {crypto.global && (
+        {crypto?.global && (
           <div className="flex items-center justify-between text-xs text-cyber-green/50 pt-2 border-t border-cyber-green/10">
             <span>MCap: <span className="text-cyber-green/70">{crypto.global.totalMarketCapFormatted}</span></span>
             <span>BTC Dom: <span className="text-cyber-green/70">{crypto.global.btcDominance}%</span></span>

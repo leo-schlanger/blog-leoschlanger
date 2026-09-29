@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Search, Globe, TrendingUp, Rss, Sunrise } from 'lucide-react';
+import { Search, Globe, TrendingUp, Rss, Sunrise, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { SearchModal } from './SearchModal';
@@ -11,6 +11,7 @@ export function Header() {
 
   const isToolsPage = location.pathname === '/tools';
   const isBriefingPage = location.pathname === '/briefing';
+  const isSavedPage = location.pathname === '/saved';
 
   return (
     <>
@@ -51,6 +52,19 @@ export function Header() {
                 <Sunrise className="h-4 w-4" />
                 <span className="hidden sm:inline text-xs font-medium">Briefing</span>
               </Link>
+              {/* Saved Link */}
+              <Link
+                to="/saved"
+                className={`p-2 rounded-lg transition-colors ${
+                  isSavedPage
+                    ? 'bg-cyber-green/20 text-cyber-green'
+                    : 'text-gray-400 hover:text-cyber-green hover:bg-cyber-green/10'
+                }`}
+                aria-label={t(translations.saved.pt, translations.saved.en)}
+                title={t(translations.saved.pt, translations.saved.en)}
+              >
+                <Bookmark className="h-4 w-4" />
+              </Link>
               {/* RSS Feed */}
               <a
                 href="/rss.xml"
@@ -73,6 +87,7 @@ export function Header() {
               {/* Language Switch */}
               <button
                 onClick={() => setLanguage(language === 'pt' ? 'en' : 'pt')}
+                aria-label={t('Mudar idioma para inglês', 'Switch language to Portuguese')}
                 className="flex items-center space-x-1.5 px-2.5 py-1.5 text-sm border border-cyber-green/30 rounded-lg hover:bg-cyber-green/10 transition-colors"
               >
                 <Globe className="h-4 w-4 text-cyber-green" />

@@ -13,25 +13,10 @@ import { SEO } from '@/components/SEO';
 import { PostImage } from '@/components/PostImage';
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { getBlogPosts, type BlogPost } from '@/lib/supabase';
-import { MARKET_DATA_URL } from '@/lib/constants';
+import { USD_INDEX_LABEL } from '@/lib/constants';
+import { useMarketData } from '@/hooks/useMarketData';
 import { formatDate } from '@/lib/utils';
 import { getPostImage } from '@/lib/defaultImages';
-
-interface ThermometerData {
-  dashboard: {
-    fearGreed: { value: number; classification: string; signal: string } | null;
-    vix: { value: number; zone: string } | null;
-    dxy: { value: number; zone: string; impact: string } | null;
-    bitcoin: {
-      price: number;
-      priceFormatted: string;
-      change24h: number;
-      changeFormatted: string;
-    } | null;
-  };
-  alerts: Array<{ level: string; title: string; message: string }>;
-  meta: { updatedAt: string };
-}
 
 function SkeletonCard() {
   return (
@@ -50,16 +35,7 @@ export function Briefing() {
   const locale = language === 'pt' ? 'pt-BR' : 'en-US';
   const todayFormatted = formatDate(today, locale);
 
-  const { data: marketData, isLoading: marketLoading } =
-    useQuery<ThermometerData>({
-      queryKey: ['briefing-market'],
-      queryFn: async () => {
-        const res = await fetch(MARKET_DATA_URL, { cache: 'no-store' });
-        if (!res.ok) throw new Error('Failed to fetch market data');
-        return res.json();
-      },
-      staleTime: 1000 * 60 * 5,
-    });
+  const { data: marketData, isLoading: marketLoading } = useMarketData();
 
   const { data: postsData, isLoading: postsLoading } = useQuery({
     queryKey: ['briefing-posts', language],
@@ -226,12 +202,12 @@ export function Briefing() {
                 </div>
               )}
 
-              {/* DXY */}
+              {/* Índice amplo do dólar */}
               {marketLoading ? (
                 <SkeletonCard />
               ) : (
                 <div className="cyber-card p-5">
-                  <p className="text-gray-400 text-sm mb-1">DXY</p>
+                  <p className="text-gray-400 text-sm mb-1">{USD_INDEX_LABEL}</p>
                   {dashboard?.dxy ? (
                     <>
                       <p className="text-3xl font-bold text-white">

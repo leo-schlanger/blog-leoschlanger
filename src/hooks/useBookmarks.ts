@@ -1,22 +1,15 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { createPersistentStore, usePersistentStore } from '@/lib/storage';
 
-const STORAGE_KEY = 'blog-bookmarks';
-
-function getStored(): number[] {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-}
+const bookmarksStore = createPersistentStore<number[]>(
+  'blog-bookmarks',
+  [],
+  (value): value is number[] =>
+    Array.isArray(value) && value.every(v => typeof v === 'number')
+);
 
 export function useBookmarks() {
-  const [bookmarkedIds, setBookmarkedIds] = useState<number[]>(getStored);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarkedIds));
-  }, [bookmarkedIds]);
+  const [bookmarkedIds, setBookmarkedIds] = usePersistentStore(bookmarksStore);
 
   const isBookmarked = useCallback(
     (id: number) => bookmarkedIds.includes(id),
@@ -27,7 +20,7 @@ export function useBookmarks() {
     setBookmarkedIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
-  }, []);
+  }, [setBookmarkedIds]);
 
   return { bookmarkedIds, isBookmarked, toggleBookmark };
 }

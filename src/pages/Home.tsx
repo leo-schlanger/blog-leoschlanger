@@ -1,76 +1,60 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, ChevronDown } from 'lucide-react';
+import { Loader2, ChevronDown, X, Hash } from 'lucide-react';
 import { BlogCard } from '@/components/BlogCard';
 import { HeroPost } from '@/components/HeroPost';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { PriceTicker } from '@/components/PriceTicker';
 import { Sidebar } from '@/components/Sidebar';
 import { SEO } from '@/components/SEO';
-import { getBlogPosts, type BlogPost } from '@/lib/supabase';
+import { getCategoryCounts } from '@/lib/supabase';
 import { useLanguage, translations } from '@/hooks/useLanguage';
-import { POSTS_PER_PAGE } from '@/lib/constants';
+import { usePaginatedPosts } from '@/hooks/usePaginatedPosts';
+import { POST_CATEGORIES } from '@/lib/constants';
 import { MarketAlertBanner } from '@/components/MarketAlertBanner';
 
 export function Home() {
   const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tag = searchParams.get('tag')?.trim() || null;
 
-  // Reset page when category changes
-  useEffect(() => {
-    setPage(1);
-    setAllPosts([]);
-  }, [selectedCategory, language]);
-
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['posts', language, page, selectedCategory],
-    queryFn: () => getBlogPosts(language, POSTS_PER_PAGE, page, selectedCategory || undefined),
+  const {
+    posts,
+    total,
+    isLoading,
+    isError,
+    refetch,
+    hasNextPage: hasMore,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = usePaginatedPosts(language, {
+    category: selectedCategory ?? undefined,
+    tag: tag ?? undefined,
   });
 
-  // Accumulate posts for infinite scroll effect
-  useEffect(() => {
-    if (data?.posts) {
-      if (page === 1) {
-        setAllPosts(data.posts);
-      } else {
-        setAllPosts(prev => {
-          const newPosts = data.posts.filter(
-            post => !prev.some(p => p.id === post.id)
-          );
-          return [...prev, ...newPosts];
-        });
-      }
-    }
-  }, [data, page]);
-
-  // Fetch category counts
-  const { data: allData } = useQuery({
-    queryKey: ['posts-counts', language],
-    queryFn: async () => {
-      const categories = ['crypto', 'macro_global', 'central_banks', 'commodities'];
-      const counts: Record<string, number> = {};
-      for (const cat of categories) {
-        const result = await getBlogPosts(language, 1, 1, cat);
-        counts[cat] = result.total;
-      }
-      return counts;
-    },
+  const { data: categoryCounts } = useQuery({
+    queryKey: ['category-counts'],
+    queryFn: () => getCategoryCounts(POST_CATEGORIES),
     staleTime: 1000 * 60 * 10, // 10 minutes
   });
 
-  const heroPost = allPosts[0];
-  const gridPosts = allPosts.slice(1);
-  const hasMore = data?.hasMore ?? false;
+  // Com filtro de tag a lista vira resultado de busca: sem destaque.
+  const heroPost = tag ? undefined : posts[0];
+  const gridPosts = tag ? posts : posts.slice(1);
 
-  const handleLoadMore = () => {
-    setPage(prev => prev + 1);
+  const clearTag = () => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      next.delete('tag');
+      return next;
+    });
   };
 
   return (
     <>
-      <SEO url="/" />
+      <SEO url="/" noindex={!!tag} />
 
       <div className="min-h-screen">
         {/* Price Ticker */}
@@ -78,7 +62,7 @@ export function Home() {
 
         {/* Hero Section */}
         <section className="container mx-auto px-4 py-8">
-          {isLoading && page === 1 ? (
+          {isLoading ? (
             <div className="h-64 lg:h-96 rounded-xl bg-cyber-dark border border-cyber-green/20 animate-pulse" />
           ) : heroPost ? (
             <HeroPost post={heroPost} />
@@ -95,8 +79,24 @@ export function Home() {
             <CategoryTabs
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
-              counts={allData}
+              counts={categoryCounts}
             />
+            {tag && (
+              <div className="mt-4 flex items-center gap-2">
+                <span className="text-gray-500 text-sm">{t('Filtrando por tag:', 'Filtering by tag:')}</span>
+                <span className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-cyber-green/10 border border-cyber-green/30 rounded text-cyber-green">
+                  <Hash className="h-3.5 w-3.5" />
+                  {tag}
+                  <button
+                    onClick={clearTag}
+                    className="ml-1 p-0.5 rounded hover:bg-cyber-green/20 transition-colors"
+                    aria-label={t('Remover filtro de tag', 'Clear tag filter')}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Two Column Layout */}
@@ -108,14 +108,14 @@ export function Home() {
                 <h2 className="text-xl font-bold text-white">
                   {t(translations.latestNews.pt, translations.latestNews.en)}
                 </h2>
-                {data && data.total > 0 && (
+                {total > 0 && (
                   <span className="text-gray-500 text-sm">
-                    {data.total} {t('notícias', 'news')}
+                    {total} {t('notícias', 'news')}
                   </span>
                 )}
               </div>
 
-              {isLoading && page === 1 ? (
+              {isLoading ? (
                 <div className="flex items-center justify-center min-h-[30vh]">
                   <Loader2 className="h-8 w-8 animate-spin text-cyber-green" />
                 </div>
@@ -131,11 +131,11 @@ export function Home() {
                   {hasMore && (
                     <div className="mt-8 text-center">
                       <button
-                        onClick={handleLoadMore}
-                        disabled={isFetching}
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
                         className="cyber-button inline-flex items-center gap-2"
                       >
-                        {isFetching ? (
+                        {isFetchingNextPage ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <ChevronDown className="h-4 w-4" />
@@ -145,6 +145,15 @@ export function Home() {
                     </div>
                   )}
                 </>
+              ) : isError ? (
+                <div className="text-center py-12">
+                  <p className="text-red-400 mb-4">
+                    {t('Não foi possível carregar as notícias.', 'Could not load the news.')}
+                  </p>
+                  <button onClick={() => refetch()} className="cyber-button">
+                    {t('Tentar novamente', 'Try again')}
+                  </button>
+                </div>
               ) : (
                 <p className="text-gray-400 text-center py-12">
                   {t(translations.noResults.pt, translations.noResults.en)}

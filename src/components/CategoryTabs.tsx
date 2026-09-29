@@ -1,5 +1,6 @@
 import { useLanguage, translations } from '@/hooks/useLanguage';
 import { cn } from '@/lib/utils';
+import { POST_CATEGORIES } from '@/lib/constants';
 
 interface CategoryTabsProps {
   selectedCategory: string | null;
@@ -7,13 +8,10 @@ interface CategoryTabsProps {
   counts?: Record<string, number>;
 }
 
-const CATEGORIES = [
+const CATEGORIES: ReadonlyArray<{ key: string | null; translationKey: string }> = [
   { key: null, translationKey: 'allCategories' },
-  { key: 'crypto', translationKey: 'crypto' },
-  { key: 'macro_global', translationKey: 'macro_global' },
-  { key: 'central_banks', translationKey: 'central_banks' },
-  { key: 'commodities', translationKey: 'commodities' },
-] as const;
+  ...POST_CATEGORIES.map(key => ({ key, translationKey: key })),
+];
 
 export function CategoryTabs({ selectedCategory, onCategoryChange, counts }: CategoryTabsProps) {
   const { t } = useLanguage();

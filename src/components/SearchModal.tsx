@@ -50,7 +50,7 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
     };
   }, [isOpen, onClose]);
 
-  const { data: results, isLoading } = useQuery({
+  const { data: results, isLoading, isError } = useQuery({
     queryKey: ['search', debouncedQuery, language],
     queryFn: () => searchPosts(debouncedQuery, language),
     enabled: debouncedQuery.length >= 2,
@@ -116,6 +116,10 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <div className="p-8 flex items-center justify-center">
               <Loader2 className="w-6 h-6 text-cyber-green animate-spin" />
             </div>
+          ) : isError ? (
+            <div className="p-8 text-center text-red-400">
+              {t('Erro ao buscar. Tente novamente.', 'Search failed. Please try again.')}
+            </div>
           ) : results && results.length > 0 ? (
             <div className="divide-y divide-cyber-green/10">
               {results.slice(0, SEARCH_RESULTS_LIMIT).map((post) => (
@@ -129,8 +133,8 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
               {results.length > SEARCH_RESULTS_LIMIT && (
                 <div className="p-4 text-center text-gray-500 text-sm">
                   {t(
-                    `Mostrando ${SEARCH_RESULTS_LIMIT} de ${results.length} resultados`,
-                    `Showing ${SEARCH_RESULTS_LIMIT} of ${results.length} results`
+                    `Mostrando os ${SEARCH_RESULTS_LIMIT} resultados mais recentes`,
+                    `Showing the ${SEARCH_RESULTS_LIMIT} most recent results`
                   )}
                 </div>
               )}

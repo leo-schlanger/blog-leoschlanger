@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { POSTS_PER_PAGE, SEARCH_QUERY_LIMIT } from '@/lib/constants';
+import { ilikeContains, isValidSlug, sanitizeSearchTerm, tagContainsPattern } from '@/lib/postgrest';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -38,25 +39,37 @@ export interface PaginatedResult {
   hasMore: boolean;
 }
 
+export interface PostFilters {
+  category?: string;
+  tag?: string;
+}
+
 export async function getBlogPosts(
   language: 'pt' | 'en' = 'pt',
   limit: number = POSTS_PER_PAGE,
   page: number = 1,
-  category?: string
+  filters: PostFilters = {}
 ): Promise<PaginatedResult> {
   const offset = (page - 1) * limit;
+  const { category } = filters;
+  const tagPattern = filters.tag ? tagContainsPattern(filters.tag) : null;
+
+  if (filters.tag && !tagPattern) {
+    return { posts: [], total: 0, hasMore: false };
+  }
 
   if (!supabase) {
-    const mockPosts = getMockPosts(language, 50);
-    const filtered = category ? mockPosts.filter(p => p.category === category) : mockPosts;
+    const mockPosts = getMockPosts(language, 50).filter(p =>
+      (!category || p.category === category) &&
+      (!filters.tag || p.tags.includes(filters.tag))
+    );
     return {
-      posts: filtered.slice(offset, offset + limit),
-      total: filtered.length,
-      hasMore: offset + limit < filtered.length
+      posts: mockPosts.slice(offset, offset + limit),
+      total: mockPosts.length,
+      hasMore: offset + limit < mockPosts.length
     };
   }
 
-  // Query com contagem total
   let query = supabase
     .from('blog_posts')
     .select('*', { count: 'exact' })
@@ -67,24 +80,51 @@ export async function getBlogPosts(
   if (category) {
     query = query.eq('category', category);
   }
+  if (tagPattern) {
+    query = query.ilike('tags', tagPattern);
+  }
 
   const { data, error, count } = await query;
 
   if (error) {
-    console.error('Error fetching posts:', error);
-    return { posts: [], total: 0, hasMore: false };
+    throw new Error(`Error fetching posts: ${error.message}`);
   }
 
-  const posts = (data || []).map(post => ({
-    ...post,
-    tags: parseTags(post.tags)
-  }));
-
   return {
-    posts,
+    posts: (data || []).map(normalizePost),
     total: count || 0,
     hasMore: offset + limit < (count || 0)
   };
+}
+
+/** Contagem de posts publicados por categoria, em paralelo e sem trazer linhas. */
+export async function getCategoryCounts(
+  categories: readonly string[]
+): Promise<Record<string, number>> {
+  if (!supabase) {
+    const mockPosts = getMockPosts('pt', 50);
+    return Object.fromEntries(
+      categories.map(cat => [cat, mockPosts.filter(p => p.category === cat).length])
+    );
+  }
+
+  const client = supabase;
+  const results = await Promise.all(
+    categories.map(async cat => {
+      const { count, error } = await client
+        .from('blog_posts')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'published')
+        .eq('category', cat);
+      if (error) throw new Error(`Error counting ${cat}: ${error.message}`);
+      return [cat, count ?? 0] as const;
+    })
+  );
+  return Object.fromEntries(results);
+}
+
+function normalizePost(post: BlogPost & { tags: string | string[] | null }): BlogPost {
+  return { ...post, tags: parseTags(post.tags) };
 }
 
 function parseTags(tags: string | string[] | null): string[] {
@@ -92,7 +132,7 @@ function parseTags(tags: string | string[] | null): string[] {
   if (Array.isArray(tags)) return tags;
   try {
     const parsed = JSON.parse(tags);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.filter((t): t is string => typeof t === 'string') : [];
   } catch {
     return [];
   }
@@ -102,90 +142,98 @@ export async function getBlogPostBySlug(
   slug: string,
   language: 'pt' | 'en' = 'pt'
 ): Promise<BlogPost | null> {
+  if (!isValidSlug(slug)) return null;
+
   if (!supabase) {
     return getMockPosts(language, 10).find(p =>
       p.slug_pt === slug || p.slug_en === slug
     ) || null;
   }
 
-  // Buscar em ambos os campos de slug para suportar troca de idioma
+  // Buscar em ambos os campos de slug para suportar troca de idioma.
+  // isValidSlug garante que o slug não contém sintaxe PostgREST.
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
     .or(`slug_pt.eq.${slug},slug_en.eq.${slug}`)
     .eq('status', 'published')
-    .single();
+    .limit(1)
+    .maybeSingle();
 
   if (error) {
-    console.error('Error fetching post:', error);
-    return null;
+    throw new Error(`Error fetching post: ${error.message}`);
   }
 
-  // Parse tags de JSON string para array
-  return data ? { ...data, tags: parseTags(data.tags) } : null;
-}
-
-export async function getCategories(): Promise<string[]> {
-  if (!supabase) {
-    return ['crypto', 'macro_global', 'central_banks', 'commodities'];
-  }
-
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select('category')
-    .eq('status', 'published');
-
-  if (error) {
-    console.error('Error fetching categories:', error);
-    return [];
-  }
-
-  const categories = [...new Set(data?.map(d => d.category) || [])];
-  return categories;
+  return data ? normalizePost(data) : null;
 }
 
 export async function searchPosts(
   query: string,
   language: 'pt' | 'en' = 'pt'
 ): Promise<BlogPost[]> {
+  const term = sanitizeSearchTerm(query);
+  if (term.length < 2) return [];
+
   if (!supabase) {
+    const needle = term.toLowerCase();
     return getMockPosts(language, 10).filter(p =>
-      p.title_pt.toLowerCase().includes(query.toLowerCase()) ||
-      p.title_en.toLowerCase().includes(query.toLowerCase())
+      p.title_pt.toLowerCase().includes(needle) ||
+      p.title_en.toLowerCase().includes(needle)
     );
   }
 
   const titleField = language === 'pt' ? 'title_pt' : 'title_en';
   const contentField = language === 'pt' ? 'content_pt' : 'content_en';
+  const pattern = ilikeContains(term);
 
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
     .eq('status', 'published')
-    .or(`${titleField}.ilike.%${query}%,${contentField}.ilike.%${query}%`)
+    .or(`${titleField}.ilike.${pattern},${contentField}.ilike.${pattern}`)
     .order('published_at', { ascending: false })
     .limit(SEARCH_QUERY_LIMIT);
 
   if (error) {
-    console.error('Error searching posts:', error);
-    return [];
+    throw new Error(`Error searching posts: ${error.message}`);
   }
 
-  return data || [];
+  return (data || []).map(normalizePost);
+}
+
+/** Posts publicados pelos IDs informados, mais recentes primeiro. */
+export async function getPostsByIds(ids: number[]): Promise<BlogPost[]> {
+  const validIds = ids.filter(id => Number.isInteger(id) && id > 0);
+  if (validIds.length === 0) return [];
+
+  if (!supabase) {
+    return getMockPosts('pt', 50).filter(p => validIds.includes(p.id));
+  }
+
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('status', 'published')
+    .in('id', validIds)
+    .order('published_at', { ascending: false });
+
+  if (error) {
+    throw new Error(`Error fetching saved posts: ${error.message}`);
+  }
+
+  return (data || []).map(normalizePost);
 }
 
 export async function getRelatedPosts(
   postId: number,
   category: string,
-  tags: string[],
   language: 'pt' | 'en' = 'pt',
   limit: number = 3
 ): Promise<BlogPost[]> {
   if (!supabase) {
-    return getMockPosts(language, limit).filter(p => p.id !== postId);
+    return getMockPosts(language, limit + 1).filter(p => p.id !== postId).slice(0, limit);
   }
 
-  // First try: same category, excluding current post
   const { data, error } = await supabase
     .from('blog_posts')
     .select('*')
@@ -196,14 +244,10 @@ export async function getRelatedPosts(
     .limit(limit);
 
   if (error) {
-    console.error('Error fetching related posts:', error);
-    return [];
+    throw new Error(`Error fetching related posts: ${error.message}`);
   }
 
-  return (data || []).map(post => ({
-    ...post,
-    tags: parseTags(post.tags)
-  }));
+  return (data || []).map(normalizePost);
 }
 
 function getMockPosts(language: 'pt' | 'en', limit: number): BlogPost[] {

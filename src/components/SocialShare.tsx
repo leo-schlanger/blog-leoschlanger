@@ -2,7 +2,6 @@ import { useLanguage } from '@/hooks/useLanguage';
 
 interface SocialShareProps {
   title: string;
-  summary: string;
   url: string;
 }
 
@@ -31,11 +30,10 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export function SocialShare({ title, summary, url }: SocialShareProps) {
+export function SocialShare({ title, url }: SocialShareProps) {
   const { t } = useLanguage();
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title);
-  const encodedSummary = encodeURIComponent(summary);
 
   const links = [
     {

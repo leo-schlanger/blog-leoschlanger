@@ -13,10 +13,15 @@ interface SEOProps {
   tags?: string[];
   category?: string;
   noindex?: boolean;
+  /** Idioma do conteúdo da página (padrão: idioma da interface). */
+  contentLanguage?: 'pt' | 'en';
+  /** Caminhos equivalentes em cada idioma (ex.: slugs PT/EN de um post). */
+  alternates?: { pt: string; en: string };
 }
 
 const SITE_NAME = 'Leo.Blog';
-const DEFAULT_IMAGE = 'https://github.com/leo-schlanger.png';
+const DEFAULT_IMAGE = 'https://blog.leoschlanger.com/og-image.png';
+const LOGO_IMAGE = 'https://blog.leoschlanger.com/icon-512.png';
 const BASE_URL = 'https://blog.leoschlanger.com';
 const AUTHOR_URL = 'https://leoschlanger.com';
 
@@ -32,8 +37,11 @@ export function SEO({
   tags = [],
   category,
   noindex = false,
+  contentLanguage,
+  alternates,
 }: SEOProps) {
-  const { language, t } = useLanguage();
+  const { language: uiLanguage, t } = useLanguage();
+  const language = contentLanguage ?? uiLanguage;
 
   const defaultTitle = t(
     'Noticias Cripto & Macro',
@@ -51,7 +59,8 @@ export function SEO({
   const locale = language === 'pt' ? 'pt_BR' : 'en_US';
   const alternateLocale = language === 'pt' ? 'en_US' : 'pt_BR';
   const hreflangCode = language === 'pt' ? 'pt-BR' : 'en';
-  const alternateHreflang = language === 'pt' ? 'en' : 'pt-BR';
+  const altPt = `${BASE_URL}${alternates?.pt ?? url ?? ''}`;
+  const altEn = `${BASE_URL}${alternates?.en ?? url ?? ''}`;
 
   // Meta tags
   useEffect(() => {
@@ -68,17 +77,15 @@ export function SEO({
       element.setAttribute('content', content);
     };
 
-    const setLink = (rel: string, href: string, extra?: Record<string, string>) => {
-      const selector = extra
-        ? `link[rel="${rel}"][hreflang="${extra.hreflang}"]`
-        : `link[rel="${rel}"]`;
+    const setLink = (rel: string, href: string, hreflang?: string) => {
+      const selector = hreflang
+        ? `link[rel="${rel}"][hreflang="${hreflang}"]`
+        : `link[rel="${rel}"]:not([hreflang])`;
       let element = document.querySelector(selector);
       if (!element) {
         element = document.createElement('link');
         element.setAttribute('rel', rel);
-        if (extra) {
-          Object.entries(extra).forEach(([k, v]) => element!.setAttribute(k, v));
-        }
+        if (hreflang) element.setAttribute('hreflang', hreflang);
         document.head.appendChild(element);
       }
       element.setAttribute('href', href);
@@ -123,23 +130,27 @@ export function SEO({
       if (category) {
         setMeta('article:section', category, true);
       }
-      tags.forEach((tag, index) => {
-        setMeta(`article:tag:${index}`, tag, true);
+      document.querySelectorAll('meta[property="article:tag"]').forEach(el => el.remove());
+      tags.forEach(tag => {
+        const element = document.createElement('meta');
+        element.setAttribute('property', 'article:tag');
+        element.setAttribute('content', tag);
+        document.head.appendChild(element);
       });
     }
 
     // Canonical URL
     setLink('canonical', finalUrl);
 
-    // Hreflang alternate links
-    setLink('alternate', finalUrl, { hreflang: hreflangCode });
-    setLink('alternate', finalUrl, { hreflang: alternateHreflang });
-    setLink('alternate', finalUrl, { hreflang: 'x-default' });
+    // Hreflang: cada idioma aponta para a sua própria URL
+    setLink('alternate', altPt, 'pt-BR');
+    setLink('alternate', altEn, 'en');
+    setLink('alternate', altPt, 'x-default');
 
     // Language
     document.documentElement.lang = hreflangCode;
 
-  }, [fullTitle, finalDescription, image, finalUrl, type, publishedAt, modifiedAt, author, tags, language, category, noindex, locale, alternateLocale, hreflangCode, alternateHreflang, defaultTitle, title]);
+  }, [fullTitle, finalDescription, image, finalUrl, type, publishedAt, modifiedAt, author, tags, category, noindex, locale, alternateLocale, hreflangCode, altPt, altEn, defaultTitle, title]);
 
   // JSON-LD Structured Data
   useEffect(() => {
@@ -168,7 +179,7 @@ export function SEO({
           name: SITE_NAME,
           logo: {
             '@type': 'ImageObject',
-            url: DEFAULT_IMAGE,
+            url: LOGO_IMAGE,
           },
         },
         mainEntityOfPage: {

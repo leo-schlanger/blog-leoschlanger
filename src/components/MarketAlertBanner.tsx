@@ -1,17 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
-import { MARKET_DATA_URL } from '@/lib/constants';
 import { useLanguage } from '@/hooks/useLanguage';
-
-interface Alert {
-  level: string;
-  title: string;
-  message: string;
-}
+import { useMarketData } from '@/hooks/useMarketData';
 
 export function MarketAlertBanner() {
   const { t } = useLanguage();
-  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const { data } = useMarketData();
+  const alerts = data?.alerts ?? [];
   const [dismissed, setDismissed] = useState<string[]>(() => {
     try {
       return JSON.parse(sessionStorage.getItem('dismissed-alerts') || '[]');
@@ -20,26 +15,14 @@ export function MarketAlertBanner() {
     }
   });
 
-  useEffect(() => {
-    const fetchAlerts = async () => {
-      try {
-        const res = await fetch(MARKET_DATA_URL, { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.alerts && data.alerts.length > 0) {
-          setAlerts(data.alerts);
-        }
-      } catch {
-        // Silent fail
-      }
-    };
-    fetchAlerts();
-  }, []);
-
   const dismiss = (title: string) => {
     const updated = [...dismissed, title];
     setDismissed(updated);
-    sessionStorage.setItem('dismissed-alerts', JSON.stringify(updated));
+    try {
+      sessionStorage.setItem('dismissed-alerts', JSON.stringify(updated));
+    } catch {
+      // Storage indisponível (modo privado); o estado em memória basta
+    }
   };
 
   const visibleAlerts = alerts.filter(a => !dismissed.includes(a.title));
@@ -48,9 +31,10 @@ export function MarketAlertBanner() {
 
   return (
     <div className="space-y-2 mb-6">
-      {visibleAlerts.map((alert, index) => (
+      {visibleAlerts.map((alert) => (
         <div
-          key={index}
+          key={alert.title}
+          role="alert"
           className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg border ${
             alert.level === 'critical'
               ? 'bg-red-500/10 border-red-500/30 text-red-400'

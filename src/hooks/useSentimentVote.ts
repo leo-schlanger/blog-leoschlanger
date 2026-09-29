@@ -1,74 +1,40 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
+import { createPersistentStore, usePersistentStore } from '@/lib/storage';
 
-const VOTES_KEY = 'blog-sentiment-votes';
-const COUNTS_KEY = 'blog-sentiment-counts';
+export type Sentiment = 'bullish' | 'bearish';
 
-type Vote = 'bullish' | 'bearish';
-
-interface VoteCounts {
-  bullish: number;
-  bearish: number;
-}
-
-function getStoredVotes(): Record<number, Vote> {
-  try {
-    return JSON.parse(localStorage.getItem(VOTES_KEY) || '{}');
-  } catch {
-    return {};
-  }
-}
-
-function getStoredCounts(): Record<number, VoteCounts> {
-  try {
-    return JSON.parse(localStorage.getItem(COUNTS_KEY) || '{}');
-  } catch {
-    return {};
-  }
-}
+/**
+ * Leitura pessoal (bullish/bearish) do usuário sobre cada notícia.
+ * Fica apenas neste navegador: não existe agregação entre leitores, então
+ * a UI não deve exibir percentuais ou contagens como se fossem coletivos.
+ */
+const votesStore = createPersistentStore<Record<string, Sentiment>>(
+  'blog-sentiment-votes',
+  {},
+  (value): value is Record<string, Sentiment> =>
+    !!value && typeof value === 'object' && !Array.isArray(value)
+    && Object.values(value).every(v => v === 'bullish' || v === 'bearish')
+);
 
 export function useSentimentVote() {
-  const [votes, setVotes] = useState<Record<number, Vote>>(getStoredVotes);
-  const [counts, setCounts] = useState<Record<number, VoteCounts>>(getStoredCounts);
+  const [votes, setVotes] = usePersistentStore(votesStore);
 
-  useEffect(() => {
-    localStorage.setItem(VOTES_KEY, JSON.stringify(votes));
-  }, [votes]);
-
-  useEffect(() => {
-    localStorage.setItem(COUNTS_KEY, JSON.stringify(counts));
-  }, [counts]);
-
-  const vote = useCallback((postId: number, sentiment: Vote) => {
+  const vote = useCallback((postId: number, sentiment: Sentiment) => {
     setVotes(prev => {
-      const existing = prev[postId];
-      if (existing === sentiment) {
-        // Remove vote
-        const { [postId]: _, ...rest } = prev;
-        return rest;
+      const next = { ...prev };
+      if (next[postId] === sentiment) {
+        delete next[postId];
+      } else {
+        next[postId] = sentiment;
       }
-      return { ...prev, [postId]: sentiment };
+      return next;
     });
+  }, [setVotes]);
 
-    setCounts(prev => {
-      const current = prev[postId] || { bullish: 0, bearish: 0 };
-      const existing = votes[postId];
+  const getVote = useCallback(
+    (postId: number): Sentiment | null => votes[postId] ?? null,
+    [votes]
+  );
 
-      const updated = { ...current };
-      // Remove previous vote if any
-      if (existing) {
-        updated[existing] = Math.max(0, updated[existing] - 1);
-      }
-      // Add new vote (unless toggling off)
-      if (existing !== sentiment) {
-        updated[sentiment] = updated[sentiment] + 1;
-      }
-
-      return { ...prev, [postId]: updated };
-    });
-  }, [votes]);
-
-  const getVote = useCallback((postId: number) => votes[postId] || null, [votes]);
-  const getCounts = useCallback((postId: number) => counts[postId] || { bullish: 0, bearish: 0 }, [counts]);
-
-  return { vote, getVote, getCounts };
+  return { vote, getVote };
 }

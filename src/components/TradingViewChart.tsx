@@ -11,9 +11,10 @@ export function TradingViewChart({ symbol, height = 220 }: TradingViewChartProps
   const { language } = useLanguage();
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    containerRef.current.innerHTML = '';
+    container.innerHTML = '';
 
     const widgetContainer = document.createElement('div');
     widgetContainer.className = 'tradingview-widget-container';
@@ -45,12 +46,10 @@ export function TradingViewChart({ symbol, height = 220 }: TradingViewChartProps
     });
 
     widgetContainer.appendChild(script);
-    containerRef.current.appendChild(widgetContainer);
+    container.appendChild(widgetContainer);
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
-      }
+      container.innerHTML = '';
     };
   }, [symbol, language]);
 

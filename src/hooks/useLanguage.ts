@@ -1,4 +1,6 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useCallback, createContext, useContext } from 'react';
+import { safeGetItem, safeSetItem } from '@/lib/storage';
+import { CATEGORY_LABELS } from '@/lib/constants';
 
 type Language = 'pt' | 'en';
 
@@ -12,17 +14,17 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function useLanguageProvider() {
   const [language, setLanguageState] = useState<Language>(() => {
-    const stored = localStorage.getItem('blog-language');
+    const stored = safeGetItem('blog-language');
     if (stored === 'pt' || stored === 'en') return stored;
     return navigator.language.startsWith('pt') ? 'pt' : 'en';
   });
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('blog-language', lang);
-  };
+    safeSetItem('blog-language', lang);
+  }, []);
 
-  const t = (pt: string, en: string) => language === 'pt' ? pt : en;
+  const t = useCallback((pt: string, en: string) => language === 'pt' ? pt : en, [language]);
 
   return { language, setLanguage, t };
 }
@@ -46,6 +48,7 @@ export const translations = {
   readMore: { pt: 'Ler mais', en: 'Read more' },
   readingTime: { pt: 'min de leitura', en: 'min read' },
   latestNews: { pt: 'Últimas Notícias', en: 'Latest News' },
+  saved: { pt: 'Salvos', en: 'Saved' },
   noResults: { pt: 'Nenhum resultado encontrado', en: 'No results found' },
   loading: { pt: 'Carregando...', en: 'Loading...' },
   source: { pt: 'Fonte', en: 'Source' },
@@ -54,10 +57,10 @@ export const translations = {
   allCategories: { pt: 'Todas as categorias', en: 'All categories' },
   notFound: { pt: 'Página não encontrada', en: 'Page not found' },
   mainSite: { pt: 'Site Principal', en: 'Main Site' },
-  crypto: { pt: 'Cripto', en: 'Crypto' },
-  macro_global: { pt: 'Macro Global', en: 'Global Macro' },
-  central_banks: { pt: 'Bancos Centrais', en: 'Central Banks' },
-  commodities: { pt: 'Commodities', en: 'Commodities' },
+  crypto: CATEGORY_LABELS.crypto,
+  macro_global: CATEGORY_LABELS.macro_global,
+  central_banks: CATEGORY_LABELS.central_banks,
+  commodities: CATEGORY_LABELS.commodities,
   europe: { pt: 'Europa', en: 'Europe' },
   asia: { pt: 'Ásia', en: 'Asia' },
   latin_america: { pt: 'América Latina', en: 'Latin America' },

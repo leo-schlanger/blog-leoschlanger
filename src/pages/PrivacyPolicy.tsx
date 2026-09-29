@@ -87,8 +87,8 @@ export function PrivacyPolicy() {
               </h3>
               <p>
                 {t(
-                  'Armazenamos sua preferência de idioma (português ou inglês) no localStorage do seu navegador. Esta informação permanece exclusivamente no seu dispositivo e não é transmitida para nenhum servidor.',
-                  'We store your language preference (Portuguese or English) in your browser\'s localStorage. This information remains exclusively on your device and is not transmitted to any server.'
+                  'Armazenamos no localStorage do seu navegador: sua preferência de idioma (português ou inglês), os artigos que você salva, seu histórico de leitura (últimos 20 artigos) e suas marcações de sentimento (bullish/bearish). Essas informações permanecem exclusivamente no seu dispositivo, não são transmitidas para nenhum servidor e podem ser apagadas a qualquer momento na página "Salvos" ou limpando os dados do site no navegador.',
+                  'We store in your browser\'s localStorage: your language preference (Portuguese or English), the articles you save, your reading history (last 20 articles) and your sentiment marks (bullish/bearish). This information remains exclusively on your device, is not transmitted to any server and can be erased at any time on the "Saved" page or by clearing the site data in your browser.'
                 )}
               </p>
 
