@@ -107,8 +107,8 @@ export function PrivacyPolicy() {
               </h3>
               <p>
                 {t(
-                  'Este blog não possui formulários de contato, cadastro, newsletter, sistema de comentários ou qualquer outro mecanismo de coleta direta de dados pessoais.',
-                  'This blog does not have contact forms, registration, newsletter, comment system, or any other mechanism for direct collection of personal data.'
+                  'Este blog não possui formulários de contato, cadastro, newsletter ou qualquer outro mecanismo próprio de coleta de dados pessoais. Os comentários nos artigos são opcionais e feitos pelo Giscus com a sua conta do GitHub (veja a seção 4.4).',
+                  'This blog does not have contact forms, registration, newsletter, or any other mechanism of its own for collecting personal data. Comments on articles are optional and handled by Giscus with your GitHub account (see section 4.4).'
                 )}
               </p>
             </div>
@@ -162,7 +162,24 @@ export function PrivacyPolicy() {
               </p>
 
               <h3 className="text-white font-medium mt-4 mb-2">
-                {t('4.4 PayPal', '4.4 PayPal')}
+                {t('4.4 Giscus (comentários)', '4.4 Giscus (comments)')}
+              </h3>
+              <p>
+                {t(
+                  'Os comentários usam o Giscus, que armazena as mensagens nas Discussions públicas do repositório do blog no GitHub. Para comentar ou reagir é preciso entrar com uma conta do GitHub; seu nome de usuário, avatar e comentário ficam públicos e são tratados pelo GitHub. Apenas ler os comentários não exige login. Consulte: ',
+                  'Comments use Giscus, which stores messages in the public Discussions of the blog repository on GitHub. Commenting or reacting requires signing in with a GitHub account; your username, avatar and comment become public and are processed by GitHub. Reading comments requires no login. See: '
+                )}
+                <a href="https://github.com/giscus/giscus/blob/main/PRIVACY-POLICY.md" target="_blank" rel="noopener noreferrer" className="text-cyber-green hover:underline">
+                  Giscus Privacy Policy
+                </a>
+                {' · '}
+                <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer" className="text-cyber-green hover:underline">
+                  GitHub Privacy Statement
+                </a>
+              </p>
+
+              <h3 className="text-white font-medium mt-4 mb-2">
+                {t('4.5 PayPal', '4.5 PayPal')}
               </h3>
               <p>
                 {t(

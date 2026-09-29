@@ -59,11 +59,13 @@ export const USD_INDEX_LABEL = 'USD Broad';
 /**
  * Configuração do Giscus (comentários via GitHub Discussions).
  * Enquanto os IDs estiverem vazios o bloco de comentários não é renderizado.
- * Obtenha os valores em https://giscus.app após habilitar Discussions no repo.
+ * Requer Discussions habilitado e o app https://github.com/apps/giscus instalado.
  */
 export const GISCUS_CONFIG = {
   repo: 'leo-schlanger/blog-leoschlanger',
-  repoId: '',
-  category: 'Comments',
-  categoryId: '',
+  repoId: 'R_kgDORRh6VQ',
+  // Categoria do tipo "anúncio": só o giscus/mantenedor abre discussões,
+  // leitores apenas comentam (evita spam de tópicos).
+  category: 'Announcements',
+  categoryId: 'DIC_kwDORRh6Vc4DGqWx',
 };

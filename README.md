@@ -50,12 +50,11 @@ npm run dev            # http://localhost:3000
 
 ## Comentários (Giscus)
 
-Desativados até serem configurados. Para ativar:
-
-1. Habilite **Discussions** no repositório e crie a categoria `Comments`.
-2. Instale o app [giscus](https://github.com/apps/giscus) no repositório.
-3. Copie `repoId` e `categoryId` de [giscus.app](https://giscus.app) para
-   `GISCUS_CONFIG` em `src/lib/constants.ts`.
+Comentários via [Giscus](https://giscus.app), armazenados nas Discussions do
+repositório (categoria **Announcements**: só o giscus abre tópicos, leitores
+comentam com a conta do GitHub). Configuração em `GISCUS_CONFIG`
+(`src/lib/constants.ts`); o app [giscus](https://github.com/apps/giscus)
+precisa estar instalado no repositório.
 
 As discussões são indexadas pelo ID do post, então as versões PT e EN
 compartilham os mesmos comentários.
